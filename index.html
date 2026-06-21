@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nông Trại Cute 🏡</title>
+    <style>
+        body { font-family: 'Nunito', 'Comic Sans MS', sans-serif; background-color: #f1f8e9; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #33691e; }
+        
+        #start-screen { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; border: 4px dashed #8bc34a; }
+        #start-screen input { padding: 10px; font-size: 18px; border-radius: 10px; border: 2px solid #ccc; margin-bottom: 20px; width: 80%; text-align: center; }
+        button { background-color: #8bc34a; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 15px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s; }
+        button:hover { background-color: #7cb342; }
+
+        #game-screen { display: none; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 550px; position: relative; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        h1 { margin: 0; font-size: 22px; color: #558b2f; display: flex; align-items: center; gap: 10px; }
+        #weather-display { font-size: 14px; background: #e0f7fa; color: #00838f; padding: 4px 10px; border-radius: 15px; font-weight: bold; border: 1px solid #b2ebf2; transition: 0.5s; }
+        .stats { font-size: 18px; font-weight: bold; color: #ff8f00; }
+
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; background-color: #e0e0e0; color: #555; padding: 8px; border-radius: 10px 10px 0 0; font-size: 14px; font-weight: bold; }
+        .tab-btn.active { background-color: #8bc34a; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .subtabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 2px solid #ffcc80; padding-bottom: 5px; justify-content: center; }
+        .subtab-btn { background-color: transparent; color: #fb8c00; padding: 5px 10px; font-size: 14px; border-radius: 10px; font-weight: bold;}
+        .subtab-btn.active { background-color: #ffe0b2; }
+        .subtab-content { display: none; }
+        .subtab-content.active { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+        .shop-item, .inv-item { background-color: #fff9c4; padding: 10px; border-radius: 15px; text-align: center; font-size: 13px; border: 2px solid #ffee58; width: 130px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .shop-item button, .inv-item button { margin-top: 8px; font-size: 12px; padding: 5px; }
+        .inv-badge { position: absolute; top: -8px; right: -8px; background: #f44336; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .plot, .pen { height: 120px; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; position: relative; box-shadow: inset 0 5px 10px rgba(0,0,0,0.3); }
+        .plot { background-color: #795548; border: 3px solid #5d4037; }
+        .pen { background-color: #aed581; border: 3px dashed #7cb342; }
+        .plot:active, .pen:active { transform: scale(0.95); }
+        
+        .emoji-display { font-size: 55px; z-index: 2; }
+        .dirty-emoji { font-size: 40px; opacity: 0.8; }
+
+        .progress-bar { width: 80%; height: 8px; background-color: rgba(255,255,255,0.4); border-radius: 5px; position: absolute; bottom: 10px; overflow: hidden; display: none; }
+        .progress-fill { height: 100%; background-color: #64dd17; width: 0%; }
+        .pen .progress-fill { background-color: #ffb300; }
+        .time-left { position: absolute; bottom: 25px; font-size: 11px; color: white; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 8px; font-weight: bold; display: none; z-index: 3; }
+        
+        .need-icon { position: absolute; top: -15px; right: -10px; font-size: 28px; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); display: none; z-index: 10; animation: bounce 0.6s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+
+        #decor-display { display: flex; justify-content: center; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 2px solid #eee; font-size: 24px; }
+        .decor-item { position: relative; cursor: help; }
+        .decor-tooltip { visibility: hidden; background-color: #333; color: #fff; text-align: center; border-radius: 5px; padding: 5px; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); font-size: 12px; white-space: nowrap; z-index: 100; }
+        .decor-item:hover .decor-tooltip { visibility: visible; }
+
+        /* --- POPUP HÀNH ĐỘNG (MODAL) --- */
+        #action-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 999; }
+        #action-modal { background: white; padding: 20px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #8bc34a; animation: popIn 0.2s ease-out; }
+        #action-modal h3 { margin-top: 0; color: #33691e; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .action-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 300px; overflow-y: auto; padding-bottom: 10px; }
+        .action-btn { background: #fff9c4; border: 2px solid #ffee58; padding: 10px; border-radius: 15px; cursor: pointer; width: 90px; transition: 0.1s; display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: bold; color: #555; }
+        .action-btn:hover { background: #fff176; transform: translateY(-2px); }
+        .action-btn .icon { font-size: 28px; margin-bottom: 5px; }
+        .close-modal-btn { background: #e0e0e0; color: #333; margin-top: 15px; width: 100%; }
+        .close-modal-btn:hover { background: #ccc; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .toast { padding: 12px 20px; border-radius: 10px; color: white; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2); animation: slideIn 0.3s ease-out forwards; opacity: 0; transform: translateX(100%); }
+        .toast.success { background-color: #4caf50; } .toast.error { background-color: #f44336; } .toast.info { background-color: #29b6f6; } .toast.weather-toast { background-color: #5c6bc0; }
+        .toast.fade-out { animation: fadeOut 0.5s forwards; }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } } @keyframes fadeOut { to { opacity: 0; transform: translateY(-20px); } }
+        /* --- GLOBAL WEATHER VISUALS --- */
+        #global-weather-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; overflow: hidden; }
+        #game-screen, #start-screen { position: relative; z-index: 1; }
+
+        /* Sun */
+        .sun { position: absolute; right: 8%; top: 6%; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff59d, #ffd54f 40%, #ffca28 60%); filter: blur(0.6px); box-shadow: 0 0 40px rgba(255,200,60,0.6); animation: sunPulse 6s ease-in-out infinite; }
+        @keyframes sunPulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+
+        /* Clouds */
+        .weather-cloud {
+            position: absolute;
+            top: 12%;
+            width: 220px;
+            height: 78px;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #eef5ff 38%, #dbe6f4 72%);
+            border-radius: 72px;
+            box-shadow: 0 14px 42px rgba(20, 44, 78, 0.12), inset 0 -10px 34px rgba(255,255,255,0.82);
+            opacity: 0.99;
+            overflow: visible;
+            filter: drop-shadow(0 10px 24px rgba(0,0,0,0.12));
+        }
+        .weather-cloud::before,
+        .weather-cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50px;
+            box-shadow: inherit;
+            opacity: 0.95;
+        }
+        .weather-cloud::before { width: 140px; height: 64px; left: -36px; top: -18px; }
+        .weather-cloud::after { width: 96px; height: 54px; right: -28px; top: -10px; }
+        @keyframes cloudDrift { from { transform: translateX(120%); } to { transform: translateX(-40%); } }
+        @keyframes cloudShimmer {
+            0% { box-shadow: 0 14px 42px rgba(20,44,78,0.10), inset 0 -10px 30px rgba(255,255,255,0.78); }
+            50% { box-shadow: 0 16px 46px rgba(20,44,78,0.16), inset 0 -12px 36px rgba(255,255,255,0.94); }
+            100% { box-shadow: 0 14px 42px rgba(20,44,78,0.10), inset 0 -10px 30px rgba(255,255,255,0.78); }
+        }
+        .weather-cloud.shimmer { animation: cloudShimmer 8s ease-in-out infinite; }
+
+        .cloud-sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1), rgba(255,255,255,0.8));
+            box-shadow: 0 0 10px rgba(255,255,255,0.9);
+            opacity: 0;
+            transform: scale(0.5);
+            animation: sparkle 2.4s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0.4) translateY(0); }
+            10% { opacity: 1; transform: scale(1.0) translateY(-6px); }
+            60% { opacity: 0.6; transform: scale(0.85) translateY(-12px); }
+            100% { opacity: 0; transform: scale(0.6) translateY(-18px); }
+        }
+
+        /* Rain */
+        .weather-rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+        .raindrop { position: absolute; width: 2px; height: 14px; background: linear-gradient(#a8d8ff, #4fc3f7); opacity: 0.9; border-radius: 2px; animation: rainFall linear infinite; }
+        @keyframes rainFall { to { transform: translateY(120vh); opacity: 0; } }
+
+        /* Lightning flash overlay */
+        .lightning-flash { position: absolute; inset: 0; background: rgba(255,255,255,0.0); pointer-events: none; animation: lightning 3s linear infinite; }
+        @keyframes lightning { 0% { background: rgba(255,255,255,0); } 2% { background: rgba(255,255,255,0.85); } 3% { background: rgba(255,255,255,0); } 50% { background: rgba(255,255,255,0); } 52% { background: rgba(255,255,255,0.6); } 53% { background: rgba(255,255,255,0); } }
+        /* Dark theme */
+        body.dark-theme { background-color: #0f1720; color: #cbd5e1; }
+        body.dark-theme #start-screen { background: #081226; color: #cbd5e1; border-color: #334155; }
+        body.dark-theme #game-screen { background: #071024; color: #e6eef8; }
+        body.dark-theme .tab-btn { background-color: #1f2937; color: #cbd5e1; }
+        body.dark-theme .tab-btn.active { background-color: #3b82f6; }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div id="global-weather-overlay"></div>
+
+        <div id="action-modal-overlay" onclick="closeModal(event)">
+        <div id="action-modal" onclick="event.stopPropagation()">
+            <h3 id="modal-title">Chọn Hành Động</h3>
+            <div id="modal-content" class="action-grid"></div>
+            <button class="close-modal-btn" onclick="document.getElementById('action-modal-overlay').style.display='none'">Đóng</button>
+        </div>
+        
+    </div>
+
+        <div id="reset-modal-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+            <div style="background:white; padding:20px; border-radius:16px; width:320px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+                <h3 style="margin-top:0;">Xác nhận đặt lại</h3>
+                <p style="color:#555;">Đặt lại sẽ xóa toàn bộ tiền, vật nuôi, cây trồng và trả về màn đặt tên. Bạn có chắc?</p>
+                <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+                    <button style="background:#ef5350; color:white; padding:8px 12px; border-radius:8px;" onclick="confirmReset()">Có, đặt lại</button>
+                    <button style="background:#e0e0e0; padding:8px 12px; border-radius:8px;" onclick="document.getElementById('reset-modal-overlay').style.display='none'">Hủy</button>
+                </div>
+            </div>
+        </div>
+
+    <div id="start-screen">
+        <h2>Chào mừng đến với Nông Trại! 🚜</h2>
+        <input type="text" id="farm-name-input" placeholder="Ví dụ: Nông Trại Vui Vẻ" value="Trang Trại Của Tôi">
+        <br><button onclick="startGame()">Bắt Đầu Chơi</button>
+    </div>
+
+    <div id="game-screen">
+        <div class="header">
+            <h1><span id="farm-name-display">Nông Trại</span> <span id="weather-display">☀️ Nắng đẹp</span></h1>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <div id="level-display" style="font-size:16px; font-weight:bold; color:#6a1b9a;">Lv 1 (0/100)</div>
+                <div class="stats" id="coin-display">💰 100</div>
+                <button onclick="openQuests()" style="background:#ffb74d; border-radius:10px; padding:6px 8px; font-size:13px;">🎯 Nhiệm vụ</button>
+            </div>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-garden', this)">🏡 Vườn</button>
+            <button class="tab-btn" onclick="switchTab('tab-animals', this)">🐄 Chuồng</button>
+            <button class="tab-btn" onclick="switchTab('tab-inventory', this)">🎒 Kho Đồ</button>
+            <button class="tab-btn" onclick="switchTab('tab-shop', this)">🛒 Cửa Hàng</button>
+            <button class="tab-btn" onclick="switchTab('tab-settings', this)">⚙️ Cài đặt</button>
+        </div>
+
+        <div id="tab-garden" class="tab-content active">
+            <p style="text-align:center; margin: 0; font-size: 13px; color:#555;">(Click vào ô đất để chọn thao tác)</p>
+            <div class="grid-layout" id="garden-grid"></div>
+        </div>
+
+        <div id="tab-animals" class="tab-content">
+            <p style="text-align:center; margin: 0; font-size: 13px; color:#555;">(Click vào chuồng để chọn thao tác)</p>
+            <div class="grid-layout" id="animal-grid"></div>
+        </div>
+
+        <div id="tab-inventory" class="tab-content">
+            <div class="subtabs">
+                <button class="subtab-btn active" onclick="switchSubTab('inv-seeds', this)">🌱 Hạt Giống</button>
+                <button class="subtab-btn" onclick="switchSubTab('inv-animals', this)">🐾 Thú Non</button>
+                <button class="subtab-btn" onclick="switchSubTab('inv-items', this)">🧪 Vật Phẩm</button>
+            </div>
+            <div id="inv-seeds" class="subtab-content active"></div>
+            <div id="inv-animals" class="subtab-content"></div>
+            <div id="inv-items" class="subtab-content"></div>
+        </div>
+
+        <div id="tab-shop" class="tab-content">
+            <div class="subtabs">
+                <button class="subtab-btn active" onclick="switchSubTab('shop-seeds', this)">🌱 Hạt Giống</button>
+                <button class="subtab-btn" onclick="switchSubTab('shop-animals', this)">🐾 Thú Non</button>
+                <button class="subtab-btn" onclick="switchSubTab('shop-items', this)">🧪 Vật Phẩm</button>
+                <button class="subtab-btn" onclick="switchSubTab('shop-decor', this)">🎀 Trang Trí</button>
+            </div>
+            <div id="shop-seeds" class="subtab-content active"></div>
+            <div id="shop-animals" class="subtab-content"></div>
+            <div id="shop-items" class="subtab-content"></div>
+            <div id="shop-decor" class="subtab-content"></div>
+        </div>
+
+        <div id="tab-settings" class="tab-content">
+            <h3 style="text-align:center; color:#555;">Cài đặt</h3>
+            <div style="display:flex; flex-direction:column; gap:10px; padding:10px; align-items:center;">
+                <div style="width:100%; display:flex; gap:10px; justify-content:center;">
+                    <button onclick="showResetModal()" style="background:#ef5350;">🔄 Đặt lại game</button>
+                </div>
+                <div style="width:100%; display:flex; gap:10px; justify-content:center; align-items:center;">
+                    <label>Giao diện:</label>
+                    <select id="theme-select" onchange="applyTheme(this.value)">
+                        <option value="light">Sáng</option>
+                        <option value="dark">Tối</option>
+                    </select>
+                </div>
+                
+            </div>
+        </div>
+
+        <div id="decor-display"></div>
+    </div>
+
+    <script>
+        
+        let coins = 100;
+        let buffs = { cropSpeed: 1.0, animalSpeed: 1.0, coinBonus: 1.0 };
+        // interval handles for clearing on reset
+        let gameLoopInterval = null, weatherInterval = null, eventInterval = null, autosaveInterval = null;
+        let lastGameTick = Date.now();
+
+        // --- HỆ THỐNG NGƯỜI CHƠI (LV / XP) ---
+        const player = { level: 1, xp: 0, xpToLevel: 100 };
+        function gainXp(amount) {
+            player.xp += amount;
+            while (player.xp >= player.xpToLevel) {
+                player.xp -= player.xpToLevel;
+                player.level += 1;
+                player.xpToLevel = Math.floor(player.xpToLevel * 1.5);
+                showPopup(`Lên cấp! Bây giờ Lv ${player.level}`, "success");
+            }
+            updateLevelDisplay();
+            saveGame();
+        }
+        function updateLevelDisplay() {
+            document.getElementById('level-display').innerText = `Lv ${player.level} (${player.xp}/${player.xpToLevel})`;
+        }
+
+        // --- NHIỆM VỤ ---
+        const questTemplates = [
+            { type: 'harvest_any', title: 'Thu hoạch {goal} cây', rewardFactor: 1.2 },
+            { type: 'buy_seed', category: 'crop', title: 'Mua {goal} hạt giống', rewardFactor: 1.1 },
+            { type: 'buy_animal', category: 'animal', title: 'Mua {goal} thú non', rewardFactor: 1.3 },
+            { type: 'plant_specific', item: 'sunflower', title: 'Trồng {goal} Hướng dương', rewardFactor: 1.4 },
+            { type: 'plant_specific', item: 'tomato', title: 'Trồng {goal} Cà chua', rewardFactor: 1.3 },
+            { type: 'plant_specific', item: 'carrot', title: 'Trồng {goal} Cà rốt', rewardFactor: 1.2 }
+        ];
+        let quests = [];
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateRandomQuests() {
+            const pool = questTemplates.slice();
+            const newQuests = [];
+            const count = 3;
+            for (let i = 0; i < count && pool.length > 0; i++) {
+                const idx = Math.floor(Math.random() * pool.length);
+                const template = pool.splice(idx, 1)[0];
+                const goal = getRandomInt(2, 4) + (template.type === 'harvest_any' ? 1 : 0);
+                const reward = {
+                    xp: Math.max(15, Math.round(goal * 14 * template.rewardFactor)),
+                    coins: Math.max(10, Math.round(goal * 18 * template.rewardFactor))
+                };
+                const title = template.title.replace('{goal}', goal).replace('{item}', template.item ? database.crop[template.item].name : '');
+                const quest = { id: `q_${template.type}_${Date.now()}_${i}`, type: template.type, title, progress: 0, goal, reward, done: false };
+                if (template.category) quest.category = template.category;
+                if (template.item) quest.item = template.item;
+                newQuests.push(quest);
+            }
+            quests = newQuests;
+            saveGame();
+        }
+
+        function openQuests() {
+            const titleEl = document.getElementById('modal-title');
+            const contentEl = document.getElementById('modal-content');
+            titleEl.innerText = 'Nhiệm vụ hiện tại';
+            contentEl.innerHTML = '';
+            if (!quests.length) {
+                contentEl.innerHTML = '<p style="color:#555; width:100%; text-align:center;">Chưa có nhiệm vụ. Đợi một chút để tạo nhiệm vụ mới.</p>';
+            } else {
+                quests.forEach(q => {
+                    const status = q.done ? '✅ Hoàn thành' : `${q.progress}/${q.goal}`;
+                    const rewardText = `Phần thưởng: ${q.reward.xp} XP, ${q.reward.coins}💰`;
+                    const card = `
+                        <div style="width:100%; text-align:left;">
+                            <strong>${q.title}</strong>
+                            <div style="font-size:12px; color:#555; margin-top:4px;">${rewardText}</div>
+                        </div>
+                        <div style="font-size:12px; color:${q.done ? '#4caf50' : '#555'};">${status}</div>
+                    `;
+                    contentEl.innerHTML += `<div class="action-btn" style="width:100%; justify-content:space-between; padding:12px; min-height:72px; align-items:flex-start;">${card}</div>`;
+                });
+            }
+            document.getElementById('action-modal-overlay').style.display = 'flex';
+        }
+
+        function checkQuestProgress(action, details = {}) {
+            let changed = false;
+            quests.forEach(q => {
+                if (q.done) return;
+                if (q.type === 'harvest_any' && action === 'harvest') {
+                    q.progress += 1; changed = true;
+                }
+                if (q.type === 'buy_seed' && action === 'buy' && details.category === 'crop') {
+                    q.progress += 1; changed = true;
+                }
+                if (q.type === 'buy_animal' && action === 'buy' && details.category === 'animal') {
+                    q.progress += 1; changed = true;
+                }
+                if (q.type === 'plant_specific' && action === 'plant' && details.item === q.item) {
+                    q.progress += 1; changed = true;
+                }
+                if (q.progress >= q.goal) {
+                    q.done = true;
+                    coins += q.reward.coins;
+                    gainXp(q.reward.xp);
+                    updateCoins();
+                    showPopup(`Hoàn thành nhiệm vụ: ${q.title}`, 'success');
+                    saveGame();
+                }
+            });
+            if (changed) {
+                renderInventory();
+                saveGame();
+            }
+            if (quests.length && quests.every(q => q.done)) {
+                showPopup('Hoàn thành cả 3 nhiệm vụ! Nhiệm vụ mới đã được tạo.', 'success');
+                generateRandomQuests();
+            }
+        }
+
+        // --- SỰ KIỆN NGẪU NHIÊN ---
+        const randomEvents = [
+            { id: 'pest', name: 'Sâu bọ tấn công', effect: ( ) => {
+                // Chọn ô cây ngẫu nhiên đang phát triển
+                const idx = Math.floor(Math.random() * cropPlots.length);
+                if (cropPlots[idx].type && !cropPlots[idx].isReady) {
+                    cropPlots[idx].progress = Math.max(0, cropPlots[idx].progress - 20);
+                    cropPlots[idx].currentNeed = 'bug';
+                    showNeedUI(idx, 'crop', 'bug');
+                    showPopup('Sâu bọ làm chậm 1 ô cây!', 'error');
+                } else showPopup('Sâu bọ ghé thăm nhưng không thấy cây nào.', 'info');
+            }},
+            { id: 'trader', name: 'Thương nhân ghé chơi', effect: ( ) => { const gain = 30 + Math.floor(Math.random()*50); coins += gain; updateCoins(); showPopup(`Thương nhân tặng bạn +${gain}💰`, 'info'); }},
+            { id: 'festival', name: 'Lễ hội trang trại', effect: ( ) => {
+                buffs.coinBonus *= 2; showPopup('Lễ hội: tiền bán tăng gấp đôi trong 10 phút!', 'weather-toast');
+                setTimeout(()=>{ buffs.coinBonus /= 2; showPopup('Lễ hội kết thúc.', 'info'); }, 600000);
+            }}
+        ];
+
+        function triggerRandomEvent() {
+            const ev = randomEvents[Math.floor(Math.random()*randomEvents.length)];
+            ev.effect();
+        }
+        let activeModalPlot = { index: null, type: null }; // Lưu vết ô đang được mở Modal
+
+        let inventory = {
+            crop: { carrot: 0, tomato: 0, sunflower: 0 },
+            animal: { chicken: 0, pig: 0, cow: 0 },
+            consumable: { fertilizer: 0, feed: 0 }
+        };
+
+        const database = {
+            crop: {
+                carrot: { name: "Cà rốt", cost: 10, sell: 25, time: 10, emojis: ['🟤', '🌱', '🌿', '🥕'] },
+                tomato: { name: "Cà chua", cost: 20, sell: 60, time: 20, emojis: ['🟤', '🌱', '🌿', '🍅'] },
+                sunflower: { name: "Hướng dương", cost: 50, sell: 150, time: 30, emojis: ['🟤', '🌱', '🌿', '🌻'] }
+            },
+            animal: {
+                chicken: { name: "Gà", cost: 30, sell: 80, time: 25, emojis: ['🥚', '🐥', '🐔'] },
+                pig: { name: "Heo", cost: 80, sell: 220, time: 40, emojis: ['🍼', '🐖', '🐷'] },
+                cow: { name: "Bò", cost: 150, sell: 450, time: 60, emojis: ['🍼', '🐄', '🐮'] }
+            },
+            consumable: {
+                fertilizer: { name: "Phân bón", cost: 15, boost: 30, typeTarget: 'crop', emojis: ['🧪'], desc: "+30% tốc độ" },
+                feed: { name: "Cám tăng trưởng", cost: 20, boost: 30, typeTarget: 'animal', emojis: ['🥣'], desc: "+30% tốc độ" }
+            },
+            decorations: {
+                scarecrow: { name: "Bù nhìn", cost: 200, emoji: "🌾", desc: "Cây lớn nhanh +25%", type: "cropSpeed", value: 1.25, owned: false },
+                fence: { name: "Hàng rào", cost: 300, emoji: "🪵", desc: "Thú lớn nhanh +25%", type: "animalSpeed", value: 1.25, owned: false },
+                fountain: { name: "Đài phun nước", cost: 500, emoji: "⛲", desc: "Bán +20% tiền", type: "coinBonus", value: 1.2, owned: false }
+            }
+        };
+
+        const weathers = [
+            { id: 'sunny', icon: '☀️', name: 'Nắng đẹp', buff: 1.0, autoWater: false, color: '#e0f7fa', textCol: '#00838f' },
+            { id: 'rainy', icon: '🌧️', name: 'Mưa rào', buff: 1.3, autoWater: true, color: '#c5cae9', textCol: '#283593' }, 
+            { id: 'stormy', icon: '⛈️', name: 'Giông bão', buff: 0.6, autoWater: false, color: '#cfd8dc', textCol: '#37474f' } 
+        ];
+        let currentWeather = weathers[0];
+
+        // KHỞI TẠO MẶC ĐỊNH LÀ BẨN (Cỏ dại / Chất thải)
+        let cropPlots = Array(4).fill().map(() => ({ type: null, isDirty: true }));
+        let animalPlots = Array(4).fill().map(() => ({ type: null, isDirty: true }));
+
+        function startGame() {
+            initGrids();
+            const nameInput = document.getElementById('farm-name-input').value;
+            document.getElementById('farm-name-display').innerText = nameInput || "Nông Trại Của Bé";
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            
+            updateCoins(); renderShops(); renderInventory();
+            if (!quests.length) generateRandomQuests();
+            showPopup("Hãy nhấp vào đất và chuồng để dọn dẹp trước khi nuôi trồng nhé!", "info");
+            
+            lastGameTick = Date.now();
+            gameLoopInterval = setInterval(gameLoop, 100);
+            weatherInterval = setInterval(changeWeather, 600000);
+            eventInterval = setInterval(triggerRandomEvent, 600000);
+            // Autosave every 15s and save on unload
+            autosaveInterval = setInterval(saveGame, 15000);
+            window.addEventListener('beforeunload', saveGame);
+            // ensure settings UI synced
+            const sel = document.getElementById('theme-select'); if (sel) sel.value = settings.theme;
+        }
+
+        function initGrids() {
+            let gardenHTML = '', animalHTML = '';
+            for(let i=0; i<4; i++) {
+                gardenHTML += createPlotHTML(i, 'crop', 'plot');
+                animalHTML += createPlotHTML(i, 'animal', 'pen');
+            }
+            document.getElementById('garden-grid').innerHTML = gardenHTML;
+            document.getElementById('animal-grid').innerHTML = animalHTML;
+            updateInitialDirtyState();
+        }
+
+        function createPlotHTML(index, type, className) {
+            return `
+                <div class="${className}" onclick="handlePlotClick(${index}, '${type}')">
+                    <div class="need-icon" id="${type}-need-${index}"></div>
+                    <div class="emoji-display" id="${type}-emoji-${index}"></div>
+                    <div class="time-left" id="${type}-time-${index}"></div>
+                    <div class="progress-bar" id="${type}-bar-${index}"><div class="progress-fill" id="${type}-fill-${index}"></div></div>
+                </div>`;
+        }
+
+        function updateInitialDirtyState() {
+            for(let i=0; i<4; i++) {
+                document.getElementById(`crop-emoji-${i}`).innerHTML = `<span class="dirty-emoji">🌾</span>`;
+                document.getElementById(`animal-emoji-${i}`).innerHTML = `<span class="dirty-emoji">💩</span>`;
+            }
+        }
+
+        // --- GIAO DIỆN CƠ BẢN ---
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            if(tabId === 'tab-inventory') renderInventory(); 
+        }
+        function switchSubTab(subTabId, btn) {
+            const parent = document.getElementById(subTabId).parentElement;
+            parent.querySelectorAll('.subtab-content').forEach(t => t.classList.remove('active'));
+            parent.parentElement.querySelectorAll('.subtab-btn').forEach(t => t.classList.remove('active'));
+            document.getElementById(subTabId).classList.add('active');
+            btn.classList.add('active');
+        }
+        function showPopup(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`; toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 500); }, 2500);
+        }
+
+        // --- MUA SẮM ---
+        function renderShops() {
+            document.getElementById('shop-seeds').innerHTML = buildShopItems('crop');
+            document.getElementById('shop-animals').innerHTML = buildShopItems('animal');
+            document.getElementById('shop-items').innerHTML = buildShopItems('consumable', true);
+            renderDecorShop();
+        }
+        function buildShopItems(category, isConsumable = false) {
+            let html = '';
+            for (let key in database[category]) {
+                const item = database[category][key];
+                const infoText = isConsumable ? `<span style="font-size:11px; color:#555;">${item.desc}</span>` : `Lãi: ${item.sell - item.cost}💰`;
+                html += `
+                    <div class="shop-item">
+                        <div style="font-size: 24px;">${item.emojis[item.emojis.length-1]}</div>
+                        <strong>${item.name}</strong>
+                        <div>${infoText}</div>
+                        <button onclick="buyItem('${key}', '${category}')">Mua (-${item.cost}💰)</button>
+                    </div>`;
+            }
+            return html;
+        }
+        function buyItem(key, category) {
+            const item = database[category][key];
+            if (coins >= item.cost) {
+                coins -= item.cost; inventory[category][key]++; updateCoins();
+                showPopup(`Đã mua ${item.name}!`, "success");
+                checkQuestProgress('buy', { category: category, key: key });
+                saveGame();
+            } else showPopup("Không đủ tiền!", "error");
+        }
+        function renderDecorShop() {
+            const decorContainer = document.getElementById('shop-decor');
+            decorContainer.innerHTML = '';
+            for (let key in database.decorations) {
+                const item = database.decorations[key];
+                if(item.owned) continue;
+                decorContainer.innerHTML += `
+                    <div class="shop-item" style="width: 100%;">
+                        <div style="display:flex; justify-content: space-around; align-items:center; width: 100%;">
+                            <div style="font-size: 30px;">${item.emoji}</div>
+                            <div style="text-align: left; width: 50%;"><strong>${item.name}</strong><br><span style="font-size:11px; color:#555;">${item.desc}</span></div>
+                            <div><button style="background-color: #ff9800;" onclick="buyDecor('${key}')">Mua ${item.cost}💰</button></div>
+                        </div>
+                    </div>`;
+            }
+        }
+        function buyDecor(key) {
+            const decor = database.decorations[key];
+            if (coins >= decor.cost) {
+                coins -= decor.cost; decor.owned = true; buffs[decor.type] = decor.value; 
+                updateCoins(); renderDecorShop();
+                document.getElementById('decor-display').innerHTML += `<div class="decor-item">${decor.emoji}<span class="decor-tooltip">${decor.name}: ${decor.desc}</span></div>`;
+                showPopup(`Đã mua ${decor.name}!`, "success");
+                saveGame();
+            } else showPopup("Không đủ tiền!", "error");
+        }
+
+        // --- KHO ĐỒ VIEW ---
+        function renderInventory() {
+            document.getElementById('inv-seeds').innerHTML = buildInventoryItems('crop');
+            document.getElementById('inv-animals').innerHTML = buildInventoryItems('animal');
+            document.getElementById('inv-items').innerHTML = buildInventoryItems('consumable');
+        }
+        function buildInventoryItems(category) {
+            let html = ''; let hasItem = false;
+            for (let key in inventory[category]) {
+                const qty = inventory[category][key];
+                if (qty > 0) {
+                    hasItem = true;
+                    const item = database[category][key];
+                    html += `
+                        <div class="inv-item">
+                            <div class="inv-badge">${qty}</div>
+                            <div style="font-size: 24px;">${item.emojis[item.emojis.length-1]}</div>
+                            <strong>${item.name}</strong>
+                            <span style="font-size: 11px; color: #888;">Có trong kho</span>
+                        </div>`;
+                }
+            }
+            return hasItem ? html : `<p style="color:#888; width:100%; text-align:center;">Kho trống. Cần mua thêm ở Cửa hàng!</p>`;
+        }
+
+        function changeWeather() {
+            let newW;
+            do { newW = weathers[Math.floor(Math.random() * weathers.length)]; } while(newW.id === currentWeather.id);
+            currentWeather = newW;
+            const wDisplay = document.getElementById('weather-display');
+            wDisplay.innerText = `${currentWeather.icon} ${currentWeather.name}`;
+            wDisplay.style.backgroundColor = currentWeather.color;
+            wDisplay.style.color = currentWeather.textCol;
+            wDisplay.style.borderColor = currentWeather.textCol;
+            showPopup(`Thời tiết đổi thành: ${currentWeather.name}`, "weather-toast");
+            renderWeatherEffects();
+        }
+
+        // --- HỆ THỐNG CLICK VÀ MODAL ---
+        function handlePlotClick(index, type) {
+            const plotArray = type === 'crop' ? cropPlots : animalPlots;
+            const plotData = plotArray[index];
+
+            // 1. Chăm sóc ưu tiên (Không cần mở Modal)
+            if (plotData.currentNeed) {
+                showPopup(`Đã xử lý xong!`, "success");
+                plotData.currentNeed = null;
+                document.getElementById(`${type}-need-${index}`).style.display = 'none';
+                return; 
+            }
+            // 2. Thu hoạch (Không cần mở Modal)
+            if (plotData.isReady) {
+                const info = database[type][plotData.type];
+                const finalSellPrice = Math.floor(info.sell * buffs.coinBonus); 
+                
+                coins += finalSellPrice; updateCoins();
+                
+                // Trả về trạng thái bẩn (cần dọn dẹp cho lần trồng sau)
+                plotArray[index] = { type: null, isDirty: true }; 
+                
+                document.getElementById(`${type}-emoji-${index}`).innerHTML = type === 'crop' ? `<span class="dirty-emoji">🌾</span>` : `<span class="dirty-emoji">💩</span>`;
+                document.getElementById(`${type}-bar-${index}`).style.display = 'none';
+                document.getElementById(`${type}-time-${index}`).style.display = 'none';
+                showPopup(`Thu hoạch +${finalSellPrice}💰`, "success");
+                // XP & quest progress
+                gainXp(10);
+                checkQuestProgress('harvest', { type: plotData.type });
+                return;
+            }
+
+            // 3. Các trường hợp khác mở Modal
+            activeModalPlot = { index, type };
+            openActionModal(plotData, type);
+        }
+
+        function openActionModal(plotData, type) {
+            const modalOverlay = document.getElementById('action-modal-overlay');
+            const titleEl = document.getElementById('modal-title');
+            const contentEl = document.getElementById('modal-content');
+            
+            modalOverlay.style.display = 'flex';
+            contentEl.innerHTML = ''; // Reset modal
+
+            // TH1: Ô đất bẩn
+            if (plotData.isDirty) {
+                titleEl.innerText = type === 'crop' ? "Khu Vườn Mọc Cỏ" : "Chuồng Đang Bẩn";
+                const actionName = type === 'crop' ? "Xới cỏ" : "Dọn chuồng";
+                const actionIcon = type === 'crop' ? "🌾" : "🧹";
+                contentEl.innerHTML = `
+                    <div class="action-btn" onclick="executeModalAction('clean')">
+                        <div class="icon">${actionIcon}</div>${actionName}
+                    </div>
+                `;
+            } 
+            // TH2: Ô đất trống sạch sẽ -> Trồng/Thả
+            else if (!plotData.type) {
+                titleEl.innerText = type === 'crop' ? "Chọn Hạt Giống" : "Chọn Thú Non";
+                let hasItem = false;
+                for (let key in inventory[type]) {
+                    if (inventory[type][key] > 0) {
+                        hasItem = true;
+                        const item = database[type][key];
+                        contentEl.innerHTML += `
+                            <div class="action-btn" onclick="executeModalAction('plant', '${key}')">
+                                <div class="icon">${item.emojis[item.emojis.length-1]}</div>
+                                ${item.name} (${inventory[type][key]})
+                            </div>
+                        `;
+                    }
+                }
+                if (!hasItem) {
+                    contentEl.innerHTML = `<p style="color:#f44336; font-size:14px; width:100%;">Bạn không có vật phẩm nào trong kho. Hãy ra Cửa hàng mua nhé!</p>`;
+                }
+            } 
+            // TH3: Đang lớn -> Sử dụng vật phẩm
+            else if (plotData.type && !plotData.isReady) {
+                titleEl.innerText = "Dùng Vật Phẩm";
+                let hasItem = false;
+                for (let key in inventory.consumable) {
+                    if (inventory.consumable[key] > 0 && database.consumable[key].typeTarget === type) {
+                        hasItem = true;
+                        const item = database.consumable[key];
+                        contentEl.innerHTML += `
+                            <div class="action-btn" onclick="executeModalAction('boost', '${key}')">
+                                <div class="icon">${item.emojis[0]}</div>
+                                ${item.name} (${inventory.consumable[key]})
+                            </div>
+                        `;
+                    }
+                }
+                if (!hasItem) {
+                    contentEl.innerHTML = `<p style="color:#888; font-size:14px; width:100%;">Không có vật phẩm tăng tốc phù hợp cho ô này.</p>`;
+                }
+            }
+        }
+
+        function closeModal(e) {
+            if(e && e.target.id === 'action-modal-overlay') {
+                document.getElementById('action-modal-overlay').style.display = 'none';
+            }
+        }
+
+        function executeModalAction(actionType, itemKey = null) {
+            const { index, type } = activeModalPlot;
+            const plotArray = type === 'crop' ? cropPlots : animalPlots;
+
+            if (actionType === 'clean') {
+                plotArray[index].isDirty = false;
+                document.getElementById(`${type}-emoji-${index}`).innerHTML = '';
+                showPopup(type === 'crop' ? "Đã xới cỏ sạch sẽ!" : "Đã dọn dẹp chuồng trại!", "info");
+                saveGame();
+            } 
+            else if (actionType === 'plant') {
+                inventory[type][itemKey]--;
+                const info = database[type][itemKey];
+                
+                plotArray[index] = { type: itemKey, isDirty: false, progress: 0, isReady: false, milestone1: false, milestone2: false, currentNeed: null };
+                
+                document.getElementById(`${type}-bar-${index}`).style.display = 'block';
+                document.getElementById(`${type}-time-${index}`).style.display = 'block';
+                showPopup(`Đã thả ${info.name} xuống!`, "info");
+                checkQuestProgress('plant', { item: itemKey });
+                saveGame();
+            } 
+            else if (actionType === 'boost') {
+                inventory.consumable[itemKey]--;
+                const info = database.consumable[itemKey];
+                
+                plotArray[index].progress += info.boost;
+                showPopup(`Đã sử dụng ${info.name}! Tăng +${info.boost}%`, "success");
+                saveGame();
+            }
+
+            // Đóng Modal và update kho UI ngầm
+            document.getElementById('action-modal-overlay').style.display = 'none';
+            renderInventory(); 
+        }
+
+        // --- VÒNG LẶP THỜI GIAN THỰC ---
+        function gameLoop() {
+            const now = Date.now();
+            const delta = Math.min(0.2, (now - lastGameTick) / 1000);
+            lastGameTick = now;
+            for (let i = 0; i < 4; i++) {
+                if (cropPlots[i].type && !cropPlots[i].isDirty) processGrowth(cropPlots[i], database.crop, i, 'crop', buffs.cropSpeed, delta);
+                if (animalPlots[i].type && !animalPlots[i].isDirty) processGrowth(animalPlots[i], database.animal, i, 'animal', buffs.animalSpeed, delta);
+            }
+        }
+
+        function processGrowth(plot, db, index, type, speedBuff, deltaSeconds) {
+            const info = db[plot.type];
+
+            if (plot.currentNeed === 'water' && currentWeather.autoWater) {
+                plot.currentNeed = null;
+                document.getElementById(`${type}-need-${index}`).style.display = 'none';
+                showPopup(`Mưa đã tự tưới nước!`, "weather-toast");
+            }
+
+            if (plot.currentNeed) {
+                document.getElementById(`${type}-time-${index}`).innerText = "Tạm dừng!";
+                document.getElementById(`${type}-time-${index}`).style.color = "#ffeb3b";
+                return;
+            }
+
+            if (!plot.isReady) {
+                const totalMultiplier = Math.max(0.1, speedBuff * currentWeather.buff);
+                const actualRequiredTime = info.time / totalMultiplier;
+                const increment = (deltaSeconds / actualRequiredTime) * 100;
+
+                plot.progress = Math.min(100, plot.progress + increment);
+
+                if (plot.progress >= 33 && !plot.milestone1) {
+                    plot.milestone1 = true;
+                    plot.currentNeed = (type === 'crop') ? 'water' : 'feed';
+                    showNeedUI(index, type, plot.currentNeed);
+                }
+                if (plot.progress >= 66 && !plot.milestone2) {
+                    plot.milestone2 = true;
+                    plot.currentNeed = (type === 'crop') ? 'bug' : 'pet';
+                    showNeedUI(index, type, plot.currentNeed);
+                }
+
+                if (plot.progress >= 100) {
+                    plot.progress = 100; plot.isReady = true;
+                    document.getElementById(`${type}-bar-${index}`).style.display = 'none'; 
+                    document.getElementById(`${type}-time-${index}`).innerText = "Thu hoạch!";
+                    document.getElementById(`${type}-time-${index}`).style.color = "#64dd17";
+                } else {
+                    document.getElementById(`${type}-fill-${index}`).style.width = plot.progress + '%';
+                    let timeLeft = Math.ceil((info.time * (1 - plot.progress/100)) / totalMultiplier);
+                    if(timeLeft < 0) timeLeft = 0;
+                    document.getElementById(`${type}-time-${index}`).innerText = timeLeft + "s";
+                    document.getElementById(`${type}-time-${index}`).style.color = "white";
+                }
+
+                let stage = 0; const maxStages = info.emojis.length - 1;
+                if (plot.progress >= 100) stage = maxStages;
+                else if (plot.progress >= 66) stage = maxStages - 1;
+                else if (plot.progress >= 33) stage = maxStages > 2 ? 1 : 0; 
+                document.getElementById(`${type}-emoji-${index}`).innerText = info.emojis[stage];
+            }
+        }
+
+        function showNeedUI(index, type, needType) {
+            const needEl = document.getElementById(`${type}-need-${index}`);
+            needEl.style.display = 'block';
+            if (needType === 'water') needEl.innerText = '💧';
+            else if (needType === 'bug') needEl.innerText = '🐛';
+            else if (needType === 'feed') needEl.innerText = '🌾';
+            else if (needType === 'pet') needEl.innerText = '💖';
+        }
+
+        function updateCoins() { document.getElementById('coin-display').innerText = `💰 ${coins}`; }
+
+        // --- WEATHER RENDERING ---
+        function renderWeatherEffects() {
+            const overlay = document.getElementById('global-weather-overlay');
+            if (!overlay) return;
+            overlay.innerHTML = '';
+
+            if (currentWeather.id === 'sunny') {
+                const sun = document.createElement('div'); sun.className = 'sun';
+                overlay.appendChild(sun);
+                for (let i = 0; i < 3; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'weather-cloud shimmer';
+                    c.style.top = (8 + i * 7) + '%';
+                    c.style.left = (i * 34) + '%';
+                    c.style.width = (160 + i * 30) + 'px';
+                    c.style.animation = `cloudDrift ${54 - i * 7}s linear infinite`;
+                    const sparkleCount = 4 + Math.floor(Math.random() * 3);
+                    for (let s = 0; s < sparkleCount; s++) {
+                        const sp = document.createElement('div'); sp.className = 'cloud-sparkle';
+                        sp.style.left = (12 + Math.random() * 76) + '%';
+                        sp.style.top = (12 + Math.random() * 56) + '%';
+                        sp.style.animationDelay = (Math.random() * 2) + 's';
+                        sp.style.animationDuration = (1.6 + Math.random() * 0.9) + 's';
+                        c.appendChild(sp);
+                    }
+                    overlay.appendChild(c);
+                }
+            }
+
+            if (currentWeather.id === 'rainy' || currentWeather.id === 'stormy') {
+                for (let i = 0; i < 3; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'weather-cloud shimmer';
+                    c.style.top = (6 + i * 9) + '%';
+                    c.style.left = (i * 32) + '%';
+                    c.style.width = (170 + i * 30) + 'px';
+                    c.style.animation = `cloudDrift ${48 - i * 6}s linear infinite`;
+                    overlay.appendChild(c);
+                }
+                const rainCont = document.createElement('div'); rainCont.className = 'weather-rain';
+                const count = (currentWeather.id === 'stormy') ? 75 : 45;
+                for (let i = 0; i < count; i++) {
+                    const r = document.createElement('div'); r.className = 'raindrop';
+                    r.style.left = (Math.random() * 100) + '%';
+                    r.style.top = (-Math.random() * 25) + '%';
+                    r.style.height = (8 + Math.random() * 12) + 'px';
+                    r.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+                    r.style.animationDelay = (-Math.random() * 2) + 's';
+                    rainCont.appendChild(r);
+                }
+                overlay.appendChild(rainCont);
+            }
+
+            if (currentWeather.id === 'stormy') {
+                const flash = document.createElement('div'); flash.className = 'lightning-flash'; overlay.appendChild(flash);
+            }
+        }
+
+        // Initial render of weather effects and auto-load
+        document.addEventListener('DOMContentLoaded', () => {
+            const hadSave = loadGame();
+            renderWeatherEffects();
+            updateLevelDisplay();
+            if (hadSave) {
+                // auto-start game if a save was found
+                startGame();
+            }
+        });
+
+        // --- SETTINGS ---
+        let settings = { theme: 'light' };
+        function applyTheme(theme) {
+            settings.theme = theme;
+            if (theme === 'dark') document.body.classList.add('dark-theme');
+            else document.body.classList.remove('dark-theme');
+            const sel = document.getElementById('theme-select'); if (sel) sel.value = theme;
+            saveGame();
+        }
+        // weatherEffects removed
+
+        // --- RESET GAME ---
+        function showResetModal() {
+            document.getElementById('reset-modal-overlay').style.display = 'flex';
+        }
+
+        function resetGame() {
+            // legacy: kept for compatibility
+            showResetModal();
+        }
+
+        function confirmReset() {
+            // clear storage and reset all runtime state
+            try { localStorage.removeItem('farm_save_v1'); } catch(e) { console.error(e); }
+            // clear intervals
+            if (gameLoopInterval) { clearInterval(gameLoopInterval); gameLoopInterval = null; }
+            if (weatherInterval) { clearInterval(weatherInterval); weatherInterval = null; }
+            if (eventInterval) { clearInterval(eventInterval); eventInterval = null; }
+            if (autosaveInterval) { clearInterval(autosaveInterval); autosaveInterval = null; }
+            try { window.removeEventListener('beforeunload', saveGame); } catch(e) {}
+
+            // reset variables
+            coins = 100;
+            buffs = { cropSpeed: 1.0, animalSpeed: 1.0, coinBonus: 1.0 };
+            player.level = 1; player.xp = 0; player.xpToLevel = 100;
+            inventory = { crop: { carrot: 0, tomato: 0, sunflower: 0 }, animal: { chicken: 0, pig: 0, cow: 0 }, consumable: { fertilizer: 0, feed: 0 } };
+            cropPlots = Array(4).fill().map(() => ({ type: null, isDirty: true }));
+            animalPlots = Array(4).fill().map(() => ({ type: null, isDirty: true }));
+            for (let k in database.decorations) database.decorations[k].owned = false;
+            quests = [];
+            generateRandomQuests();
+            settings = { theme: 'light' };
+
+            // reset UI to start screen
+            const input = document.getElementById('farm-name-input'); if (input) input.value = 'Trang Trại Của Tôi';
+            const display = document.getElementById('farm-name-display'); if (display) display.innerText = 'Nông Trại';
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'block';
+
+            updateCoins(); updateLevelDisplay(); renderInventory(); renderShops(); renderDecorDisplay(); initGrids();
+
+            document.getElementById('reset-modal-overlay').style.display = 'none';
+            showPopup('Đã đặt lại game. Bạn trở về màn đặt tên.', 'info');
+        }
+
+        // --- SAVE / LOAD ---
+        function saveGame() {
+            try {
+                const decorOwned = {};
+                for (let k in database.decorations) decorOwned[k] = database.decorations[k].owned || false;
+                const farmNameEl = document.getElementById('farm-name-display');
+                const farmInput = document.getElementById('farm-name-input');
+                const farmName = (farmNameEl && farmNameEl.innerText) || (farmInput && farmInput.value) || '';
+                const state = { coins, buffs, player, inventory, cropPlots, animalPlots, decorOwned, quests, farmName, settings };
+                localStorage.setItem('farm_save_v1', JSON.stringify(state));
+                //console.log('Game saved');
+            } catch (e) { console.error('Save failed', e); }
+        }
+
+        function loadGame() {
+            try {
+                const s = localStorage.getItem('farm_save_v1');
+                if (!s) return false;
+                const st = JSON.parse(s);
+                coins = st.coins ?? coins;
+                if (st.buffs) buffs = Object.assign(buffs, st.buffs);
+                if (st.player) { player.level = st.player.level || player.level; player.xp = st.player.xp || player.xp; player.xpToLevel = st.player.xpToLevel || player.xpToLevel; }
+                if (st.inventory) inventory = st.inventory;
+                if (st.cropPlots) cropPlots = st.cropPlots;
+                if (st.animalPlots) animalPlots = st.animalPlots;
+                if (st.decorOwned) {
+                    for (let k in st.decorOwned) if (database.decorations[k]) database.decorations[k].owned = st.decorOwned[k];
+                }
+                if (st.quests) quests = st.quests;
+                if (st.settings) settings = Object.assign(settings, st.settings);
+                if (st.farmName) {
+                    const input = document.getElementById('farm-name-input');
+                    const display = document.getElementById('farm-name-display');
+                    if (input) input.value = st.farmName;
+                    if (display) display.innerText = st.farmName;
+                }
+                // apply settings to UI
+                const sel = document.getElementById('theme-select'); if (sel) sel.value = settings.theme;
+                applyTheme(settings.theme);
+                if (!quests.length) generateRandomQuests();
+                updateCoins(); updateLevelDisplay(); renderDecorDisplay();
+                return true;
+            } catch (e) { console.error('Load failed', e); return false; }
+        }
+
+        function renderDecorDisplay() {
+            const container = document.getElementById('decor-display'); container.innerHTML = '';
+            for (let key in database.decorations) {
+                const item = database.decorations[key];
+                if (item.owned) container.innerHTML += `<div class="decor-item">${item.emoji}<span class="decor-tooltip">${item.name}: ${item.desc}</span></div>`;
+            }
+        }
+
+        // Call save after key actions
+    </script>
+</body>
+</html>
