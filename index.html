@@ -2,14 +2,37 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Nuôi Thú Ảo Thời Gian Thực</title>
+    <!-- Cấu hình chống zoom chuẩn cho mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Đảo Thú Ảo Pro - Giao Diện Chuẩn</title>
     <style>
         :root {
-            --bg-color: #f0f2f5;
+            --bg-color: #f0f4f8;
             --panel-color: #ffffff;
             --primary-color: #4caf50;
-            --text-color: #333;
+            --primary-dark: #388e3c;
+            --accent-color: #ff9800;
+            --text-color: #2c3e50;
+            --border-color: #e2e8f0;
+            --sub-panel: #f8fafc;
+            --card-menu: #f1f5f9;
+        }
+
+        /* Variables cho Dark Mode */
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --panel-color: #1e293b;
+            --text-color: #f1f5f9;
+            --border-color: #334155;
+            --sub-panel: #0f172a;
+            --card-menu: #334155;
+        }
+
+        /* Chống highlight màu xanh khi tap và tối ưu phản hồi chạm */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            touch-action: manipulation; 
         }
 
         body {
@@ -20,25 +43,31 @@
             padding: 10px;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         #game-container {
             width: 100%;
-            max-width: 500px;
+            max-width: 480px; 
             background: var(--panel-color);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             position: relative;
+            transition: background-color 0.3s;
         }
 
-        /* Màn hình đặt tên */
+        /* MÀN HÌNH SET UP ĐẦU GAME */
         #setup-screen {
             position: absolute;
             top:0; left:0; right:0; bottom:0;
-            background: #fff;
+            background: var(--panel-color);
             z-index: 10;
             display: flex;
             flex-direction: column;
@@ -49,103 +78,107 @@
         }
 
         .pet-select-btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             margin: 10px;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--panel-color);
+            color: var(--text-color);
+            transition: all 0.2s;
         }
         .pet-select-btn.active {
             border-color: var(--primary-color);
             background: #e8f5e9;
+            color: #2c3e50;
+            transform: scale(1.05);
         }
 
-        /* Header thông tin chung */
+        /* HEADER TRẠNG THÁI */
         #header-status {
-            background: #fff;
-            padding: 15px;
-            border-bottom: 2px solid #eee;
+            background: var(--panel-color);
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .status-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .bar-container {
-            background: #eee;
+            background: var(--border-color);
             border-radius: 10px;
-            height: 15px;
+            height: 12px;
             width: 100%;
-            margin-top: 5px;
+            margin-top: 4px;
             overflow: hidden;
         }
 
         .bar {
             height: 100%;
             width: 100%;
-            transition: width 0.3s, background-color 0.3s;
+            transition: width 0.4s ease;
         }
         .bar-hunger { background: #ff9800; }
-        .bar-thirst { background: #2196f3; }
+        .bar-thirst { background: #00bcd4; }
         .bar-fun { background: #e91e63; }
         .bar-exp { background: #9c27b0; }
 
-        /* Hệ thống Tabs chính */
+        /* TABS CHÍNH */
         .main-tabs {
             display: flex;
-            background: #f9f9f9;
-            border-bottom: 1px solid #ddd;
+            background: var(--sub-panel);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .tab-btn {
             flex: 1;
-            padding: 12px;
+            padding: 14px 2px;
             border: none;
             background: none;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
-            color: #666;
+            font-size: 11px;
+            color: #64748b;
+            transition: all 0.2s;
         }
 
         .tab-btn.active {
             color: var(--primary-color);
             border-bottom: 3px solid var(--primary-color);
-            background: #fff;
+            background: var(--panel-color);
         }
 
-        /* Nội dung Tab */
+        /* NỘI DUNG TAB */
         .tab-content {
             display: none;
-            padding: 15px;
-            min-height: 300px;
-            max-height: 400px;
+            padding: 20px;
+            min-height: 340px;
+            max-height: 420px;
             overflow-y: auto;
         }
 
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content.active { display: block; }
 
-        /* Subtabs (nằm trong tab Cửa hàng) */
+        /* SUBTABS */
         .sub-tabs {
             display: flex;
-            margin-bottom: 10px;
-            gap: 5px;
+            margin-bottom: 15px;
+            gap: 8px;
         }
 
         .sub-tab-btn {
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            background: #fff;
+            padding: 6px 16px;
+            border: 1px solid var(--border-color);
+            background: var(--panel-color);
+            color: var(--text-color);
             border-radius: 20px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         .sub-tab-btn.active {
@@ -154,306 +187,190 @@
             border-color: var(--primary-color);
         }
 
-        .mini-mode-btn {
-            padding: 8px 14px;
-            border: 1px solid #ddd;
-            background: #fff;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-        }
+        .sub-content { display: none; }
+        .sub-content.active { display: block; }
 
-        .mini-mode-btn.active {
-            background: var(--primary-color);
-            color: #fff;
-            border-color: var(--primary-color);
-        }
-
-        .sub-content {
-            display: none;
-        }
-        .sub-content.active {
-            display: block;
-        }
-
-        /* Giao diện tương tác chính */
+        /* KHU VỰC THÚ CƯNG CHÍNH */
         #pet-display {
             text-align: center;
             padding: 20px 0;
-            font-size: 70px;
-            animation: bounce 2s infinite alternate;
+            font-size: 85px;
+            animation: bounce 1.5s infinite alternate ease-in-out;
         }
 
         @keyframes bounce {
             from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
+            to { transform: translateY(-12px); }
         }
 
-        /* Items trong shop / túi đồ */
+        /* GRID ITEMS */
         .grid-list {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
         }
 
         .item-card {
-            border: 1px solid #eee;
-            padding: 10px;
-            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 12px;
             text-align: center;
-            background: #fafafa;
+            background: var(--sub-panel);
+            transition: transform 0.2s;
         }
+        .item-card:hover { transform: translateY(-2px); }
 
         .game-btn {
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 5px;
-            width: 100%;
-        }
-
-        .game-btn:disabled {
-            background: #ccc;
-        }
-
-        /* Mini game canvas */
-        #minigame-canvas {
-            background: #e3f2fd;
-            display: block;
-            margin: 0 auto;
-            border: 2px solid #90caf9;
+            padding: 10px 14px;
             border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 8px;
+            width: 100%;
+            transition: background 0.2s;
         }
+        .game-btn:hover { background: var(--primary-dark); }
+        .game-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        /* Hệ thống nhiệm vụ */
-        .quest-item {
-            border-left: 4px solid #2196f3;
-            background: #f4fbfd;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 0 8px 8px 0;
+        /* CANVAS & TRÒ CHƠI */
+        .game-menu-card {
+            background: var(--card-menu);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        body.dark {
-            --bg-color: #0f172a;
-            --panel-color: #111827;
-            --surface-bg: #1e293b;
-            --primary-color: #60a5fa;
-            --text-color: #e2e8f0;
-            --panel-border: #334155;
-            --muted-text: #94a3b8;
+        #minigame-area { display: none; text-align: center; }
+        #minigame-canvas {
+            background: #e2e8f0;
+            display: block;
+            margin: 10px auto;
+            border: 3px solid #cbd5e1;
+            border-radius: 12px;
+            max-width: 100%;
         }
 
-        body.dark .popup-card {
-            background: var(--panel-color);
-            color: var(--text-color);
-        }
-
-        body.dark #game-container,
-        body.dark .item-card,
-        body.dark .tab-content,
-        body.dark .theme-option {
-            background: var(--surface-bg);
-        }
-
-        body.dark #header-status {
-            background: var(--panel-color);
-            border-bottom-color: var(--panel-border);
-        }
-
-        body.dark .main-tabs {
-            background: var(--panel-color);
-            border-bottom-color: var(--panel-border);
-        }
-
-        body.dark .tab-btn {
-            color: var(--text-color);
-        }
-
-        body.dark .tab-btn.active {
-            background: var(--surface-bg);
-            border-color: var(--primary-color);
-        }
-
-        body.dark .sub-tab-btn,
-        body.dark .mini-mode-btn {
-            border-color: var(--panel-border);
-            color: var(--text-color);
-            background: var(--panel-color);
-        }
-
-        body.dark .sub-tab-btn.active,
-        body.dark .mini-mode-btn.active {
+        /* BIÊN ĐỘ KHÓ: NÚT PHẢN XẠ */
+        #click-target {
+            width: 115px;
+            height: 115px;
+            background: #ef4444;
+            border-radius: 50%;
+            margin: 20px auto;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             color: #fff;
-            background: var(--primary-color);
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
 
-        body.dark .game-btn {
-            background: var(--primary-color);
-            color: #fff;
+        /* NHIỆM VỤ */
+        .quest-item {
+            border-left: 4px solid var(--primary-color);
+            background: var(--sub-panel);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 0 12px 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .quest-item.completed { border-left-color: #64748b; opacity: 0.5; }
+
+        /* SETTING ROW */
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        body.dark .tab-btn {
-            color: var(--text-color);
-            background: var(--panel-color);
-        }
-
-        body.dark .tab-btn.active {
-            background: var(--surface-bg);
-            border-color: var(--primary-color);
-        }
-
-        body.dark .bar-container {
-            background: #243244;
-        }
-
-        body.dark .quest-item {
-            background: #0f172a;
-            border-left-color: var(--primary-color);
-        }
-
-        body.dark #minigame-canvas {
-            background: #0f172a;
-            border-color: #334155;
-        }
-
-        body.dark .popup-card p,
-        body.dark .popup-card button,
-        body.dark .theme-option {
-            color: var(--text-color);
-        }
-
-        body.dark input {
-            background: #0f172a;
-            color: var(--text-color);
-            border-color: #334155;
-        }
-
-        .popup-overlay {
-            position: fixed;
-            inset: 0;
+        /* POPUP UI */
+        #custom-popup {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(15, 23, 42, 0.45);
-            z-index: 50;
             padding: 20px;
         }
-
-        .popup-overlay.active {
-            display: flex;
-        }
-
-        .popup-card {
-            background: #ffffff;
-            border-radius: 18px;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
-            width: min(420px, 100%);
-            max-width: 420px;
-            padding: 24px;
+        .popup-box {
+            background: var(--panel-color);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 16px;
             text-align: center;
-            position: relative;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+            animation: popScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-
-        .popup-card h3 {
-            margin: 0 0 10px;
-            font-size: 20px;
+        .popup-btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
-
-        .popup-card p {
-            margin: 0 0 18px;
-            color: #444;
-            line-height: 1.5;
-        }
-
-        .popup-close-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            border: none;
-            background: transparent;
-            font-size: 20px;
-            cursor: pointer;
-            color: #777;
-        }
-
-        .theme-option {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border: 1px solid #ddd;
-            background: #fff;
-            border-radius: 14px;
-            padding: 10px 14px;
-            cursor: pointer;
-            margin: 5px 5px 0 0;
-            min-width: 120px;
-            font-size: 14px;
-        }
-
-        .theme-option.active {
-            border-color: var(--primary-color);
-            background: rgba(76, 175, 80, 0.12);
-        }
-
-        .muted-text {
-            color: #666;
-        }
-
-        body.dark .muted-text {
-            color: #94a3b8;
-        }
-
-        .settings-panel {
-            display: grid;
-            gap: 16px;
+        @keyframes popScale {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <!-- MÀN HÌNH ĐẶT TÊN / CHỌN THÚ BAN ĐẦU -->
+    <!-- POPUP UI (Tích hợp hệ thống nút bấm kép) -->
+    <div id="custom-popup">
+        <div class="popup-box">
+            <div id="pop-icon" style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+            <div id="pop-title" style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Thông báo</div>
+            <div id="pop-msg" style="font-size: 14px; color: #64748b; margin-bottom: 10px; white-space: pre-line;">Nội dung.</div>
+            
+            <div class="popup-btn-container">
+                <button id="pop-btn-cancel" class="game-btn" style="background:#64748b; margin-top:0; display:none;" onclick="closePopup()">Hủy</button>
+                <button id="pop-btn-confirm" class="game-btn" style="margin-top:0;" onclick="closePopup()">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH SET UP -->
     <div id="setup-screen" style="display: none;">
-        <h2>Chào mừng bạn đến với đảo thú ảo!</h2>
-        <p>Chọn người bạn đồng hành của bạn:</p>
-        <div>
-            <button class="pet-select-btn active" onclick="selectPetType('dog', this)">🐶 Chó Con</button>
-            <button class="pet-select-btn" onclick="selectPetType('cat', this)">🐱 Mèo Con</button>
+        <h2 style="color: var(--primary-color); margin-bottom:5px;">ĐẢO THÚ ẢO PRO</h2>
+        <p style="color:#64748b; font-size:14px;">Chọn và đặt tên cho người bạn thú cưng của bạn</p>
+        <div style="margin: 15px 0;">
+            <button class="pet-select-btn active" id="btn-sel-dog" onclick="selectPetType('dog')">🐶 Chó Con</button>
+            <button class="pet-select-btn" id="btn-sel-cat" onclick="selectPetType('cat')">🐱 Mèo Con</button>
         </div>
-        <input type="text" id="pet-name-input" placeholder="Đặt tên cho thú cưng..." style="padding: 10px; width: 80%; margin: 15px 0; font-size: 16px; border-radius: 5px; border:1px solid #ccc;">
-        <p style="font-size: 14px; margin: 15px 0 10px 0;">👤 Giới tính của bạn:</p>
-        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
-            <button class="pet-select-btn active" data-gender="male" onclick="selectGender('male', this)" style="flex: 1;">👨 Nam</button>
-            <button class="pet-select-btn" data-gender="female" onclick="selectGender('female', this)" style="flex: 1;">👩 Nữ</button>
-        </div>
-        <p style="font-size: 14px; margin: 15px 0 10px 0;">🎂 Tuổi của bạn:</p>
-        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
-            <input type="number" id="player-age-input" placeholder="Nhập tuổi..." min="1" max="100" value="18" style="padding: 8px; width: 150px; font-size: 14px; border-radius: 5px; border:1px solid #ccc; text-align: center;">
-        </div>
-        <button class="game-btn" style="width: 80%; font-size: 18px;" onclick="startGame()">Bắt đầu hành trình</button>
+        <input type="text" id="pet-name-input" placeholder="Nhập tên thú cưng..." style="padding: 12px; width: 80%; margin-bottom: 20px; font-size: 16px; border-radius: 10px; border: 2px solid var(--border-color); background: var(--sub-panel); color: var(--text-color); text-align:center;">
+        <button class="game-btn" style="width: 85%; font-size: 16px;" onclick="startGame()">Bắt Đầu Nuôi Thú</button>
     </div>
 
     <!-- HEADER TRẠNG THÁI -->
     <div id="header-status">
         <div class="status-row">
-            <strong id="display-pet-name">Thú cưng</strong>
-            <span id="display-level" style="background:#9c27b0; color:white; padding: 2px 8px; border-radius:10px; font-size:12px;">Lv 1</span>
+            <strong id="display-pet-name" style="font-size: 18px;">Thú cưng</strong>
+            <span id="display-level" style="background:#9c27b0; color:white; padding: 3px 10px; border-radius:12px; font-size:12px; font-weight:bold;">Lv 1</span>
         </div>
         <div class="status-row">
-            <span>💰 Xu: <b id="display-coins">100</b></span>
-            <span class="muted-text" style="font-size: 12px;">Kinh nghiệm: <span id="text-exp">0/100</span></span>
+            <span style="font-size: 15px;">💰 Vàng: <b id="display-coins" style="color:#d97706;">100</b></span>
+            <span style="font-size: 12px; color:#64748b;">Kinh nghiệm: <span id="text-exp">0/100</span></span>
         </div>
         <div class="bar-container"><div id="bar-exp" class="bar bar-exp"></div></div>
 
-        <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 12px;">
+        <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 11px; font-weight:600;">
             <div>🍖 Đói: <span id="text-hunger">100</span>% <div class="bar-container"><div id="bar-hunger" class="bar bar-hunger"></div></div></div>
             <div>💧 Khát: <span id="text-thirst">100</span>% <div class="bar-container"><div id="bar-thirst" class="bar bar-thirst"></div></div></div>
             <div>🎉 Vui vẻ: <span id="text-fun">100</span>% <div class="bar-container"><div id="bar-fun" class="bar bar-fun"></div></div></div>
@@ -462,505 +379,361 @@
 
     <!-- TABS CHÍNH -->
     <div class="main-tabs">
-        <button class="tab-btn active" onclick="switchTab('tab-home', this)">🏡 Nhà</button>
-        <button class="tab-btn" onclick="switchTab('tab-shop', this)">🛒 Cửa Hàng</button>
-        <button class="tab-btn" onclick="switchTab('tab-game', this)">🎮 Mini Game</button>
-        <button class="tab-btn" onclick="switchTab('tab-quest', this)">📜 Nhiệm Vụ</button>
-        <button class="tab-btn" onclick="switchTab('tab-settings', this)">⚙️ Cài đặt</button>
+        <button class="tab-btn active" onclick="switchTab('tab-home')">🏡 Nhà</button>
+        <button class="tab-btn" onclick="switchTab('tab-shop')">🛒 Cửa Hàng</button>
+        <button class="tab-btn" onclick="switchTab('tab-game')">🎮 Giải Trí</button>
+        <button class="tab-btn" onclick="switchTab('tab-quest')">📜 Nhiệm Vụ</button>
+        <button class="tab-btn" onclick="switchTab('tab-setting')">⚙️ Cài Đặt</button>
     </div>
 
     <!-- NỘI DUNG TABS -->
-    <!-- 1. TAB NHÀ -->
+    <!-- TAB NHÀ -->
     <div id="tab-home" class="tab-content active">
         <div id="pet-display">🐶</div>
-        <h3 style="text-align: center; margin: 5px 0;" id="pet-status-text">Đang rất vui vẻ!</h3>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-        <h4>🎒 Túi đồ của bạn:</h4>
-        <div class="grid-list" id="inventory-list">
-            <!-- Tự động render vật phẩm sở hữu -->
-        </div>
+        <h3 style="text-align: center; margin: 5px 0 20px 0; font-size:16px;" id="pet-status-text">Đang rất hạnh phúc!</h3>
+        <h4 style="margin-bottom:10px;">🎒 Túi Đồ Của Bạn:</h4>
+        <div class="grid-list" id="inventory-list"></div>
     </div>
 
-    <!-- 2. TAB CỬA HÀNG (Có Subtabs) -->
+    <!-- TAB SHOP -->
     <div id="tab-shop" class="tab-content">
         <div class="sub-tabs">
-            <button class="sub-tab-btn active" onclick="switchSubTab('shop-food', this)">🍖 Thức ăn</button>
-            <button class="sub-tab-btn" onclick="switchSubTab('shop-drink', this)">💧 Đồ uống</button>
+            <button class="sub-tab-btn active" id="sb-food" onclick="switchSubTab('shop-food')">🍖 Đồ Ăn</button>
+            <button class="sub-tab-btn" id="sb-drink" onclick="switchSubTab('shop-drink')">💧 Đồ Uống</button>
         </div>
-
-        <div id="shop-food" class="sub-content active">
-            <div class="grid-list">
-                <div class="item-card">
-                    <div>🥩 Thịt Tươi (+20 Đói)</div>
-                    <div>Giá: 💰15 xu</div>
-                    <button class="game-btn" onclick="buyItem('meat', 15)">Mua</button>
-                </div>
-                <div class="item-card">
-                    <div>🫓 Bánh Quy (+10 Đói)</div>
-                    <div>Giá: 💰8 xu</div>
-                    <button class="game-btn" onclick="buyItem('cookie', 8)">Mua</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="shop-drink" class="sub-content">
-            <div class="grid-list">
-                <div class="item-card">
-                    <div>💧 Nước Suối (+20 Khát)</div>
-                    <div>Giá: 💰10 xu</div>
-                    <button class="game-btn" onclick="buyItem('water', 10)">Mua</button>
-                </div>
-                <div class="item-card">
-                    <div>🥛 Sữa Hộp (+35 Khát)</div>
-                    <div>Giá: 💰20 xu</div>
-                    <button class="game-btn" onclick="buyItem('milk', 20)">Mua</button>
-                </div>
-            </div>
-        </div>
+        <div id="shop-food" class="sub-content active"><div class="grid-list" id="shop-food-list"></div></div>
+        <div id="shop-drink" class="sub-content"><div class="grid-list" id="shop-drink-list"></div></div>
     </div>
 
-    <!-- 3. TAB MINI GAME -->
+    <!-- TAB MINI GAME -->
     <div id="tab-game" class="tab-content">
-        <h4 style="margin-top:0;">🎮 Mini Game</h4>
-        <p id="game-mode-desc" class="muted-text" style="font-size:12px; margin-top:-10px;">Dùng chuột hoặc chạm màn hình để di chuyển Thú Cưng và hoàn thành thử thách.</p>
-        <div class="sub-tabs">
-            <button class="mini-mode-btn active" onclick="selectMiniGame('catch', this)">🦴 Hứng xương</button>
-            <button class="mini-mode-btn" onclick="selectMiniGame('tap', this)">❤️ Bấm nhanh</button>
-            <button class="mini-mode-btn" onclick="selectMiniGame('avoid', this)">💣 Tránh bom</button>
-            <button class="mini-mode-btn" onclick="selectMiniGame('race', this)">🏃Nhanh tay</button>
+        <div id="game-menu">
+            <h4 style="margin-top:0;">Chọn Trò Chơi Kiếm Xu:</h4>
+            <div class="game-menu-card">
+                <div><b>🦴 1. Hứng Thức Ăn</b><br><span style="font-size:11px; color:#64748b;">Kéo vuốt trái phải hứng xương</span></div>
+                <button class="game-btn" style="width:auto;" onclick="initMiniGame(1)">Chơi</button>
+            </div>
+            <div class="game-menu-card">
+                <div><b>⚡ 2. Siêu Phản Xạ</b><br><span style="font-size:11px; color:#64748b;">Chỉ bấm khi đổi màu xanh lá</span></div>
+                <button class="game-btn" style="width:auto;" onclick="initMiniGame(2)">Chơi</button>
+            </div>
+            <div class="game-menu-card">
+                <div><b>🪙 3. Tung Đồng Xu</b><br><span style="font-size:11px; color:#64748b;">Đoán mặt sấp hay ngửa</span></div>
+                <button class="game-btn" style="width:auto;" onclick="initMiniGame(3)">Chơi</button>
+            </div>
+            <div class="game-menu-card">
+                <div><b>🔢 4. Đoán Số Thần Kì</b><br><span style="font-size:11px; color:#64748b;">Đoán số từ 1-10</span></div>
+                <button class="game-btn" style="width:auto;" onclick="initMiniGame(4)">Chơi</button>
+            </div>
         </div>
-        <div style="font-size: 12px; margin-bottom: 12px;">
-            <span id="plays-left" class="muted-text">Lượt chơi: 5/5</span>
+
+        <div id="minigame-area">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b id="game-title">Tên Trò Chơi</b>
+                <button class="game-btn" style="width:auto; margin:0; background:#ef4444;" onclick="backToGameMenu()">Thoát</button>
+            </div>
+            <div id="game-interactive-zone" style="margin: 15px 0;"></div>
+            <canvas id="minigame-canvas" width="320" height="220" style="display:none;"></canvas>
         </div>
-        <div style="text-align: center; margin-bottom: 10px;">
-            <button class="game-btn" style="width:auto; padding:5px 15px;" id="start-game-btn" onclick="startMiniGame()">Chơi ngay</button>
-        </div>
-        <canvas id="minigame-canvas" width="300" height="200"></canvas>
-        <div id="minigame-info" style="margin-top: 10px; font-size: 13px; color: #666;">Nhấn Chơi ngay để bắt đầu.</div>
     </div>
 
-    <!-- 4. TAB NHIỆM VỤ -->
+    <!-- TAB NHIỆM VỤ -->
     <div id="tab-quest" class="tab-content">
-        <h4 style="margin-top: 0;">📜 Nhiệm vụ hằng ngày</h4>
-        <div id="quest-list">
-            <!-- Render nhiệm vụ tự động -->
-        </div>
+        <h4 style="margin: 0 0 12px 0;">📜 Nhiệm Vụ Hằng Ngày</h4>
+        <div id="quest-list"></div>
     </div>
 
-    <div id="tab-settings" class="tab-content">
-        <h4 style="margin-top: 0;">⚙️ Cài đặt</h4>
-        <div class="settings-panel">
+    <!-- TAB CÀI ĐẶT -->
+    <div id="tab-setting" class="tab-content">
+        <h4 style="margin-top:0;">⚙️ Cấu Hình Hệ Thống</h4>
+        
+        <div class="setting-row">
             <div>
-                <div style="font-weight: bold; margin-bottom: 10px;">Chủ đề</div>
-                <div style="display:flex; flex-wrap: wrap; gap: 8px;">
-                    <button class="theme-option active" data-theme="light" onclick="setTheme('light', this)">🌤️ Sáng</button>
-                    <button class="theme-option" data-theme="dark" onclick="setTheme('dark', this)">🌙 Tối</button>
-                </div>
+                <b>Chủ đề giao diện</b><br>
+                <span style="font-size:11px; color:#64748b;">Thay đổi màu nền Sáng hoặc Tối</span>
             </div>
-            <div>
-                <div style="font-weight: bold; margin-bottom: 10px;">Thiết lập lại trò chơi</div>
-                <button class="game-btn" style="width:auto;" onclick="resetGame()">Đặt lại game</button>
-                <p class="muted-text" style="font-size:12px; margin:8px 0 0;">Xóa dữ liệu hiện tại và bắt đầu lại từ đầu.</p>
-            </div>
+            <button class="game-btn" style="width:auto; margin:0; padding:6px 12px; background:#4f46e5;" id="theme-toggle-btn" onclick="toggleTheme()">Chế độ Tối</button>
         </div>
-    </div>
-</div>
 
-<div id="popup-overlay" class="popup-overlay">
-    <div class="popup-card">
-        <button class="popup-close-btn" onclick="hidePopup()">×</button>
-        <h3 id="popup-title">Thông báo</h3>
-        <p id="popup-message"></p>
-        <div id="popup-actions" style="display:flex; justify-content:center; gap: 10px;">
-            <button class="game-btn" onclick="hidePopup()" style="width:auto; margin: 0 auto;">Đóng</button>
+        <div class="setting-row" style="border-bottom:none; margin-top:20px;">
+            <div>
+                <b style="color:#ef4444;">Dữ liệu trò chơi</b><br>
+                <span style="font-size:11px; color:#64748b;">Xóa toàn bộ quá trình nuôi và chơi lại từ đầu</span>
+            </div>
+            <button class="game-btn" style="width:auto; margin:0; padding:6px 12px; background:#ef4444;" onclick="triggerResetConfirm()">Đặt lại game</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- KHỞI TẠO DỮ LIỆU GAME ---
+    // CHẶN THAO TÁC ZOOM MOBILE
+    document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+    document.addEventListener('dblclick', function (e) { e.preventDefault(); });
+
+    // --- LỜI CHÀO NGẪU NHIÊN ---
+    const greetingList = [
+        "Chủ nhân ơi, em đã đợi ngóng anh/chị mãi đấy! ❤️",
+        "Chào mừng trở lại! Hôm nay chúng ta sẽ chơi trò gì đây? 🐾",
+        "Gặp lại chủ nhân rồi, em vui đến mức muốn reo hò luôn này! ✨",
+        "Anh/Chị có mua quà gì về cho em không đó? Hóng quá đi! 🎁",
+        "Chủ nhân đi đâu mà lâu thế, suýt chút nữa là em dỗi rồi nha! 🥺",
+        "Woof/Meow! Cuối cùng anh/chị cũng chịu online rồi! 🐶🐱",
+        "Hôm nay chủ nhân trông tuyệt vời quá, cùng em dạo chơi nào! ☀️",
+        "Bụng em bắt đầu kêu rột rột rồi nè, chủ nhân ơi chăm sóc em đi! 🍖",
+        "Chào mừng trở lại hòn đảo thú ảo pro! Nạp năng lượng thôi nào! 🚀",
+        "Em vừa mơ thấy chủ nhân cho em ăn cả một núi thịt tươi luôn á! 🥩",
+        "A! Người hùng của em đã xuất hiện rồi! Thưởng xu thôi nào! 💰",
+        "Nhớ chủ nhân muốn xỉu luôn! Ôm một cái thật chặt nào! 🤗",
+        "Hôm nay hãy cùng nhau hoàn thành thật nhiều nhiệm vụ nhé! 📜",
+        "Chủ nhân ơi, em đã tự chuẩn bị sẵn sàng để đi chơi game rồi! 🎮",
+        "Chào ngày mới tốt lành! Đừng bỏ quên em cô đơn một mình nha! 🌈",
+        "Suốt thời gian qua em đã ngoan lắm đó, mau xoa đầu khen em đi! 🥰",
+        "Cốc cốc! Có ai ở nhà không? Thú cưng đáng yêu đang đợi được cưng nựng! 🏡",
+        "Chủ nhân khỏe không ạ? Nhìn thấy anh/chị là mọi mệt mỏi của em tan biến hết! 💖",
+        "Hôm nay chúng ta nhất định phải phá kỷ lục mini-game nha! ⚡",
+        "Em đã sẵn sàng 100% năng lượng để đồng hành cùng chủ nhân rồi! 🔋"
+    ];
+
+    // --- GAME STATE CỐ ĐỊNH ---
     let gameState = {
-        hasPet: false,
-        petType: 'dog',
-        name: '',
-        playerGender: 'male',
-        playerAge: 18,
-        level: 1,
-        exp: 0,
-        coins: 100,
-        hunger: 100,
-        thirst: 100,
-        fun: 100,
-        inventory: { meat: 2, cookie: 5, water: 2, milk: 1 },
-        quests: [
-            { id: 1, text: 'Cho ăn 10 lần', type: 'feed', target: 10, current: 0, reward: 20, done: false },
-            { id: 2, text: 'Chơi mini-game đạt 50 điểm', type: 'game_score', target: 50, current: 0, reward: 30, done: false },
-            
-        ]
-        ,
-        gameStats: {
-            catch: { plays: 5, lastReset: new Date().toDateString() },
-            tap: { plays: 5, lastReset: new Date().toDateString() },
-            avoid: { plays: 5, lastReset: new Date().toDateString() },
-            race: { plays: 5, lastReset: new Date().toDateString() }
-        },
-        settings: { theme: 'light' },
-        lastQuestResetDate: new Date().toDateString(),
-        lastTime: Date.now()
-    };
-    let popupTimeout;
-    let popupConfirmCallback = null;
-    let currentMiniGame = 'catch';
-    let miniGameData = {
-        duration: 10,
-        timeLeft: 10,
-        speed: 4,
-        targetX: 150,
-        targetY: 40,
-        bombX: 150,
-        bombY: 0,
-        mode: 'catch'
+        hasPet: false, petType: 'dog', name: '', level: 1, exp: 0, coins: 100,
+        hunger: 100, thirst: 100, fun: 100,
+        inventory: { meat: 1, cookie: 2, water: 2, milk: 0 },
+        quests: [], lastTime: Date.now(), lastResetDate: "",
+        theme: "light" 
     };
 
     const itemDetails = {
-        meat: { name: 'Thịt Tươi', icon: '🥩', stat: 'hunger', value: 20 },
-        cookie: { name: 'Bánh Quy', icon: '🫓', stat: 'hunger', value: 10 },
-        water: { name: 'Nước Suối', icon: '💧', stat: 'thirst', value: 20 },
-        milk: { name: 'Sữa Hộp', icon: '🥛', stat: 'thirst', value: 35 }
+        meat: { name: 'Thịt Tươi', icon: '🥩', type: 'food', price: 15, stat: 'hunger', value: 25 },
+        cookie: { name: 'Bánh Quy', icon: '🫓', type: 'food', price: 8, stat: 'hunger', value: 12 },
+        water: { name: 'Nước Suối', icon: '💧', type: 'drink', price: 10, stat: 'thirst', value: 20 },
+        milk: { name: 'Sữa Hộp', icon: '🥛', type: 'drink', price: 18, stat: 'thirst', value: 35 }
     };
 
-    // --- LỜI CHÀO NGẪU NHIÊN ---
-const greetingMessages = [
-    // ==========================================
-    // NHÓM 1: CÁC CÂU DỄ THƯƠNG, GẦN GŨI (12 CÂU)
-    // ==========================================
-    (name, gender, age) => `Chúc ${gender === 'male' ? 'anh' : 'chị'} một ngày vui vẻ! Bé ${gameState.petType === 'dog' ? '🐶' : '🐱'} ${name} đang chờ ${gender === 'male' ? 'anh' : 'chị'} đó!`,
-    (name, gender, age) => `Hôm nay ${gender === 'male' ? 'anh' : 'chị'} sẽ gặp may mắn! 😍 Nhưng trước hết phải chơi game với bé ${name} nhé!`,
-    (name, gender, age) => `Ủa, ${gender === 'male' ? 'anh' : 'chị'} đã ${age} tuổi rồi mà vẫn đam mê chơi game cùng bé ${name} cơ à? 😄 Dễ thương dữ!`,
-    (name, gender, age) => `${gender === 'male' ? 'Cậu chủ' : 'Cô chủ'} đã trở lại! Bé ${name} nhớ ${gender === 'male' ? 'anh' : 'chị'} lắm rồi!`,
-    (name, gender, age) => `Hôm nay tuyệt vời! ${gender === 'male' ? 'Anh' : 'Chị'} và bé ${name} sẽ cùng nhau chinh phục game nhé! 🎮`,
-    (name, gender, age) => `Bé ${name} bảo hôm nay là ngày đẹp trời để ${gender === 'male' ? 'anh' : 'chị'} vào cày game! 🌞 Let's go!`,
-    (name, gender, age) => `Cảnh báo: Bạn ${gameState.petType === 'dog' ? '🐶 Chó' : '🐱 Mèo'} tên ${name} sắp "phát điên" vì nhớ chủ rồi! 😹`,
-    (name, gender, age) => `Nuôi bé ${name} bấy lâu, hôm nay một người trưởng thành ${age} tuổi như ${gender === 'male' ? 'anh' : 'chị'} đã sẵn sàng thắng game chưa? 😂`,
-    (name, gender, age) => `Welcome back! Tuổi ${age} rồi mà vẫn tin vào phép thuật của game và độ cute của bé ${name} đúng không? 🪄`,
-    (name, gender, age) => `Thế là ${gender === 'male' ? 'anh' : 'chị'} đã quay lại! Bé ${name} đang vẫy đuôi mừng rỡ kìa! 🐕‍🦺`,
-    (name, gender, age) => `Hôm nay là ngày may mắn! Hãy cùng bé ${name} thắng cả 4 game nào ${gender === 'male' ? 'anh' : 'chị'} ơi! 🍀`,
-    (name, gender, age) => `Chào ${gender === 'male' ? 'anh' : 'chị'}! Hôm nay hãy cùng bé ${name} trở thành cao thủ nhé! 💪`,
+    const defaultQuestsPool = [
+        { id: 1, text: 'Cho thú cưng ăn 2 lần', type: 'feed', target: 2, current: 0, reward: 25, done: false },
+        { id: 2, text: 'Cho thú cưng uống nước', type: 'drink', target: 1, current: 0, reward: 15, done: false },
+        { id: 3, text: 'Hứng được 8 cái xương (Game 1)', type: 'game_bone', target: 8, current: 0, reward: 30, done: false },
+        { id: 4, text: 'Đạt 3 điểm Phản Xạ Nhanh (Game 2)', type: 'game_click', target: 3, current: 0, reward: 35, done: false },
+        { id: 5, text: 'Chơi trò đoán số 1 lần (Game 4)', type: 'game_guess', target: 1, current: 0, reward: 15, done: false }
+    ];
 
-    // ==========================================
-    // NHÓM 2: CÁC CÂU HÀI HƯỚC, TROLL SEN (13 CÂU)
-    // ==========================================
-    (name, gender, age) => `Tin khẩn: Bé ${name} vừa nạp 100% năng lượng đáng yêu để cùng chủ nhân ${age} tuổi gánh team! ⚡`,
-    (name, gender, age) => `Nghe nói ${gender === 'male' ? 'anh' : 'chị'} chơi game rất "pro"? Bé ${name} đang chống mắt lên xem đây ạ! 👀`,
-    (name, gender, age) => `${age} bánh chưng rồi mà vẫn bị bé ${name} "thao túng tâm lý" bắt vào chơi game đúng không? 😜`,
-    (name, gender, age) => `Có một sự thật là: Bé ${name} thích nhìn ${gender === 'male' ? 'anh' : 'chị'} chơi game hơn là ăn hạt! (Đùa đấy, hạt vẫn hơn) 🍖`,
-    (name, gender, age) => `Meo meo gâu gâu! Dịch nghĩa: Bé ${name} đang giục ${gender === 'male' ? 'anh' : 'chị'} kiếm tiền mua pate kìa! 💸`,
-    (name, gender, age) => `Chào mừng ${gender === 'male' ? 'cậu chủ' : 'cô chủ'}! Hôm nay ${name} hứa sẽ không phá bĩnh khi ${gender === 'male' ? 'anh' : 'chị'} đang combat! 😇`,
-    (name, gender, age) => `${gender === 'male' ? 'Anh' : 'Chị'} ơi dậy chưa? Bé ${name} chuẩn bị sẵn bàn tay may mắn để "vía" cho tuổi ${age} thắng đậm hôm nay! 🐾`,
-    (name, gender, age) => `Tránh đường nào! Cao thủ ${age} tuổi và trợ lý bốn chân ${name} đã xuất hiện! 🚀`,
-    (name, gender, age) => `Dù ${gender === 'male' ? 'anh' : 'chị'} có bao nhiêu tuổi đi chăng nữa, thì trong mắt bé ${name}, bạn vẫn là một chiếc "Sen" quyền lực! 😎`,
-    (name, gender, age) => `Nhiệm vụ hôm nay của ${gender === 'male' ? 'anh' : 'chị'}: 1. Chơi game thắng. 2. Cho ${name} ăn. Đừng làm ngược lại nha! 🍚`,
-    (name, gender, age) => `Bé ${name} vừa đi xem bói về, thầy phán hôm nay vận thế tuổi ${age} của ${gender === 'male' ? 'anh' : 'chị'} sẽ có chuỗi thắng siêu đỉnh! 🔮`,
-    (name, gender, age) => `Nhìn kìa! Đôi mắt long lanh của ${name} đang gửi ngàn lời chúc may mắn đến ${gender === 'male' ? 'anh' : 'chị'} đó! ✨`,
-    (name, gender, age) => `Game khó đã có ${name} lo! À không, ${name} chỉ biết cổ vũ thôi, còn lại dựa vào kinh nghiệm ${age} năm trên cuộc đời của ${gender === 'male' ? 'anh' : 'chị'} cả đấy! 🏆`,
+    let gameLoopInterval = null;
 
-    // ==========================================
-    // NHÓM 3: HỆ THẦN BÀI TAROT & VŨ TRỤ (15 CÂU)
-    // ==========================================
-    (name, gender, age) => `Tử vi tuổi ${age} hôm nay: Bé ${name} vừa rút cho ${gender === 'male' ? 'anh' : 'chị'} lá bài 'The Sun' ☀️ Chuỗi thắng vang dội đang tới!`,
-    (name, gender, age) => `Vũ trụ gửi tín hiệu: Nếu ${gender === 'male' ? 'anh' : 'chị'} không vào chơi với ${name} ngay, lá bài tiếp theo sẽ là... 'The Tower' (sập nguồn) đó! 💥`,
-    (name, gender, age) => `Trải bài Tarot sáng nay của bé ${name} dự báo: Tuổi ${age} hôm nay có quý nhân phù trợ bốn chân, bao thắng mọi mặt trận! 🐾✨`,
-    (name, gender, age) => `Lá bài 'The Empress' đã xuất hiện! Bé ${name} phán hôm nay ${gender === 'male' ? 'cậu chủ' : 'cô chủ'} sẽ là ông hoàng/bà chúa của trò chơi này! 👑`,
-    (name, gender, age) => `Bé ${name} vừa lật lá bài 'The Wheel of Fortune' 🎡 Vòng quay may mắn tuổi ${age} đã điểm, vào test nhân phẩm thôi ${gender === 'male' ? 'anh' : 'chị'} ơi!`,
-    (name, gender, age) => `Thông điệp vũ trụ: Sức mạnh từ lá 'Strength' 💪 đang nằm trong tay bé ${name}. Hãy cùng bé vượt qua mọi thử thách game khó hôm nay!`,
-    (name, gender, age) => `Bé ${name} đang nhắm mắt cảm nhận năng lượng... Tarot phán tuổi ${age} của ${gender === 'male' ? 'anh' : 'chị'} hôm nay chơi game chỉ có 'mượt' trở lên! 🔮`,
-    (name, gender, age) => `Cảnh báo năng lượng: Lá bài 'The Devil' 😈 xuất hiện! Bé ${name} biết ${gender === 'male' ? 'anh' : 'chị'} đang bị trò chơi này mê hoặc rồi, cày thôi!`,
-    (name, gender, age) => `Tarot bảo rằng: Tuổi ${age} không quan trọng, quan trọng là ${gender === 'male' ? 'anh' : 'chị'} có đủ định lực để không làm bé ${name} thất vọng trong trận tới không! 🧘‍♂️`,
-    (name, gender, age) => `Bé ${name} vừa bốc được lá 'The Star' ⭐ Tỏa sáng thôi ${gender === 'male' ? 'cậu chủ' : 'cô chủ'} ơi, hôm nay vận may đang độ bạn rồi!`,
-    (name, gender, age) => `Lá bài 'The Magician' 🪄 dự báo: Hôm nay ${gender === 'male' ? 'anh' : 'chị'} sẽ có những pha xử lý game xuất thần biến ảo làm bé ${name} phải trầm trồ!`,
-    (name, gender, age) => `Trải bài 3 lá của bé ${name} hôm nay: Quá khứ cày game, hiện tại chơi game, tương lai... thắng đậm cùng ${name}! 🃏`,
-    (name, gender, age) => `Thông điệp chữa lành: Lá 'The Lovers' 🥰 chứng minh mối quan hệ định mệnh giữa chủ nhân ${age} tuổi và bé cưng ${name}. Vào game thôi nào!`,
-    (name, gender, age) => `Thần bài ${name} phán: Hôm nay ${gender === 'male' ? 'anh' : 'chị'} cấm đi đường tắt, cứ tự tin đối đầu trực diện là sẽ đạt điểm tối đa! 🏹`,
-    (name, gender, age) => `Một nguồn năng lượng tích cực từ vũ trụ đang đổ về phía ${gender === 'male' ? 'anh' : 'chị'}. Bé ${name} đã sẵn sàng làm trợ lý Tarot cho bạn rồi! 🌌`
-];
+    // --- CẢI TIẾN POPUP ĐA CHỨC NĂNG ---
+    function openPopup(title, msg, icon = "🎉", onConfirm = null) {
+        document.getElementById('pop-title').innerText = title;
+        document.getElementById('pop-msg').innerText = msg;
+        document.getElementById('pop-icon').innerText = icon;
+        
+        let cancelBtn = document.getElementById('pop-btn-cancel');
+        let confirmBtn = document.getElementById('pop-btn-confirm');
 
-    function showRandomGreeting() {
-        if (!gameState.hasPet) return;
-        const randomGreeting = greetingMessages[Math.floor(Math.random() * greetingMessages.length)];
-        const greeting = randomGreeting(gameState.name, gameState.playerGender, gameState.playerAge);
-        showPopup('💬 ' + gameState.name, greeting);
+        if (onConfirm) {
+            cancelBtn.style.display = 'block';
+            confirmBtn.style.background = '#ef4444';
+            confirmBtn.innerText = 'Xóa luôn';
+            confirmBtn.onclick = () => {
+                onConfirm();
+                closePopup();
+            };
+        } else {
+            cancelBtn.style.display = 'none';
+            confirmBtn.style.background = 'var(--primary-color)';
+            confirmBtn.innerText = 'Xác nhận';
+            confirmBtn.onclick = closePopup;
+        }
+
+        document.getElementById('custom-popup').style.display = 'flex';
     }
 
+    function closePopup() { 
+        document.getElementById('custom-popup').style.display = 'none'; 
+    }
 
-    let selectedSetupType = 'dog';
-
-    // --- CƠ CHẾ THỜI GIAN THỰC (OFFLINE PROGRESS) ---
+    // --- KHỞI ĐỘNG HỆ THỐNG VÀ TIME THỰC ---
     function initGame() {
-        let saved = localStorage.getItem('virtual_pet_save');
+        let saved = localStorage.getItem('pet_island_pro_save');
+        let todayStr = new Date().toISOString().split('T')[0];
+        let randomGreeting = greetingList[Math.floor(Math.random() * greetingList.length)];
+
         if (saved) {
             gameState = JSON.parse(saved);
-            
-            // Reset quest nếu qua ngày mới
-            let today = new Date().toDateString();
-            if (gameState.lastQuestResetDate !== today) {
-                gameState.quests.forEach(q => q.done = false);
-                gameState.quests.forEach(q => {
-                    if (q.type !== 'reach_lv2') q.current = 0;
-                });
-                gameState.lastQuestResetDate = today;
-            }
-
-            // Reset plays mỗi ngày
-            if (!gameState.gameStats) gameState.gameStats = { catch: { plays: 5, lastReset: today }, tap: { plays: 5, lastReset: today }, avoid: { plays: 5, lastReset: today }, race: { plays: 5, lastReset: today } };
-            for (let game in gameState.gameStats) {
-                if (gameState.gameStats[game].lastReset !== today) {
-                    gameState.gameStats[game].plays = 5;
-                    gameState.gameStats[game].lastReset = today;
-                }
-            }
-            
-            // Tính toán lượng giảm chỉ số khi người chơi thoát game
             let now = Date.now();
-            let offlineMs = now - gameState.lastTime;
-            let offlineMinutes = Math.floor(offlineMs / 60000);
-            let offlineHours = Math.floor(offlineMinutes / 60);
+            let elapsedMins = Math.floor((now - gameState.lastTime) / 60000);
+            
+            applyTheme(gameState.theme || "light");
 
-            if (offlineMinutes > 0) {
-                // Mỗi 5 phút: giảm 1 đói, 1 khát, 1 vui vẻ
-                let decreaseAmount = Math.floor(offlineMinutes / 5);
-                gameState.hunger = Math.max(0, gameState.hunger - decreaseAmount);
-                gameState.thirst = Math.max(0, gameState.thirst - decreaseAmount);
-                gameState.fun = Math.max(0, gameState.fun - decreaseAmount);
-                
-                // Phần thưởng offline: 10 xu mỗi giờ
-                let offlineReward = Math.floor(offlineHours * 10);
-                if (offlineReward > 0) {
-                    gameState.coins += offlineReward;
-                    showPopup('Phần thưởng offline', `Chào mừng trở lại! Bạn được thưởng 💰${offlineReward} xu và thú cưng đã đợi ${offlineMinutes} phút.`);
-                } else {
-                    showPopup('Chào mừng trở lại!', `Thú cưng đã đợi bạn ${offlineMinutes} phút. Chỉ số đã giảm nhẹ.`);
-                }
-            } else if (gameState.hasPet) {
-                showRandomGreeting();
+            if (elapsedMins > 0) {
+                let reduce = Math.floor(elapsedMins / 6);
+                gameState.hunger = Math.max(0, gameState.hunger - reduce);
+                gameState.thirst = Math.max(0, gameState.thirst - reduce);
+                gameState.fun = Math.max(0, gameState.fun - reduce);
+                openPopup(`Bé ${gameState.name} chào bạn!`, `${randomGreeting}\n\n(Bạn đã vắng mặt ${elapsedMins} phút. Chỉ số giảm nhẹ!)`, "❤️");
+            } else {
+                openPopup(`Bé ${gameState.name} nhắn:`, randomGreeting, "✨");
             }
-            gameState.lastTime = now;
+
+            if (gameState.lastResetDate !== todayStr) {
+                gameState.quests = JSON.parse(JSON.stringify(defaultQuestsPool));
+                gameState.lastResetDate = todayStr;
+            }
             document.getElementById('setup-screen').style.display = 'none';
         } else {
             document.getElementById('setup-screen').style.display = 'flex';
+            gameState.quests = JSON.parse(JSON.stringify(defaultQuestsPool));
+            gameState.lastResetDate = todayStr;
+            applyTheme("light");
         }
 
-        applyTheme(gameState.settings?.theme || 'light');
-        
-        // Vòng lặp giảm chỉ số tự động mỗi 15 giây khi đang mở game
         setInterval(() => {
             gameState.hunger = Math.max(0, gameState.hunger - 1);
             gameState.thirst = Math.max(0, gameState.thirst - 1);
             gameState.fun = Math.max(0, gameState.fun - 1);
-            gameState.lastTime = Date.now();
-            saveGame();
-            updateUI();
-        }, 15000);
+            saveGame(); updateUI();
+        }, 12000);
 
-        updateUI();
+        buildShopUI(); updateUI();
     }
 
     function saveGame() {
         gameState.lastTime = Date.now();
-        localStorage.setItem('virtual_pet_save', JSON.stringify(gameState));
+        localStorage.setItem('pet_island_pro_save', JSON.stringify(gameState));
     }
 
-    function showPopup(title, message) {
-        popupConfirmCallback = null;
-        document.getElementById('popup-title').innerText = title || 'Thông báo';
-        document.getElementById('popup-message').innerText = message;
-        document.getElementById('popup-actions').innerHTML = `<button class="game-btn" onclick="hidePopup()" style="width:auto; margin: 0 auto;">Đóng</button>`;
-        document.getElementById('popup-overlay').classList.add('active');
-        clearTimeout(popupTimeout);
-        popupTimeout = setTimeout(hidePopup, 6000);
-    }
-
-    function showConfirmPopup(title, message, callback) {
-        popupConfirmCallback = callback;
-        document.getElementById('popup-title').innerText = title || 'Xác nhận';
-        document.getElementById('popup-message').innerText = message;
-        document.getElementById('popup-actions').innerHTML = `
-            <button class="game-btn" onclick="confirmPopup(true)" style="width:auto;">Có</button>
-            <button class="game-btn" onclick="confirmPopup(false)" style="width:auto; background:#999;">Không</button>
-        `;
-        document.getElementById('popup-overlay').classList.add('active');
-        clearTimeout(popupTimeout);
-    }
-
-    function confirmPopup(confirmed) {
-        if (confirmed && typeof popupConfirmCallback === 'function') {
-            popupConfirmCallback();
-        }
-        hidePopup();
-    }
-
-    function hidePopup() {
-        document.getElementById('popup-overlay').classList.remove('active');
+    // --- CHỦ ĐỀ SÁNG TỐI ---
+    function toggleTheme() {
+        let newTheme = gameState.theme === "dark" ? "light" : "dark";
+        gameState.theme = newTheme;
+        applyTheme(newTheme);
+        saveGame();
     }
 
     function applyTheme(theme) {
-        document.body.classList.toggle('dark', theme === 'dark');
-        gameState.settings.theme = theme;
-        saveGame();
-        document.querySelectorAll('.theme-option').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme));
+        document.documentElement.setAttribute('data-theme', theme);
+        let btn = document.getElementById('theme-toggle-btn');
+        if (theme === "dark") {
+            btn.innerText = "Chế độ Sáng";
+            btn.style.background = "#eab308";
+        } else {
+            btn.innerText = "Chế độ Tối";
+            btn.style.background = "#4f46e5";
+        }
     }
 
-    function setTheme(theme, btn) {
-        document.querySelectorAll('.theme-option').forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
-        applyTheme(theme);
+    // --- POPUP CONFIRM ĐẶT LẠI GAME CHUYÊN NGHIỆP ---
+    function triggerResetConfirm() {
+        openPopup(
+            "Cảnh báo dữ liệu! ⚠️", 
+            "Hành động này sẽ xóa vĩnh viễn toàn bộ quá trình nuôi thú, cấp độ, túi đồ và số vàng hiện tại của bạn.\n\nBạn chắc chắn muốn làm mới chứ?", 
+            "🧹", 
+            executeResetGame
+        );
     }
 
-    function resetGame() {
-        showConfirmPopup('Đặt lại game', 'Bạn có chắc muốn đặt lại trò chơi? Dữ liệu hiện tại sẽ bị xóa và bạn sẽ quay lại phần chọn thú đầu tiên.', () => {
-            localStorage.removeItem('virtual_pet_save');
-            location.reload();
-        });
+    function executeResetGame() {
+        localStorage.removeItem('pet_island_pro_save');
+        openPopup("Đang khởi tạo lại...", "Hệ thống đang dọn dẹp hòn đảo. Trò chơi sẽ tự tải lại sau vài giây!", "🔄");
+        setTimeout(() => {
+            window.location.reload();
+        }, 1800);
     }
 
-    // --- LOGIC MÀN HÌNH SET UP ĐẦU GAME ---
-    let selectedGender = 'male';
-    function selectPetType(type, btn) {
-        selectedSetupType = type;
-        document.querySelectorAll('[onclick*="selectPetType"]').forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
-    }
-    function selectGender(gender, btn) {
-        selectedGender = gender;
-        document.querySelectorAll('[data-gender]').forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
+    // --- THIẾT LẬP THÚ CƯNG ---
+    function selectPetType(type) {
+        gameState.petType = type;
+        document.getElementById('btn-sel-dog').classList.remove('active');
+        document.getElementById('btn-sel-cat').classList.remove('active');
+        if (type === 'dog') document.getElementById('btn-sel-dog').classList.add('active');
+        else document.getElementById('btn-sel-cat').classList.add('active');
     }
 
     function startGame() {
-        let nameInput = document.getElementById('pet-name-input').value.trim();
-        let ageInput = document.getElementById('player-age-input').value.trim();
-        if (!nameInput) {
-            showPopup('Yêu cầu', 'Vui lòng đặt tên cho bé cưng của bạn!');
-            return;
-        }
-        if (!ageInput || ageInput < 1 || ageInput > 100) {
-            showPopup('Yêu cầu', 'Vui lòng nhập tuổi hợp lệ (1-100)!');
-            return;
-        }
-        gameState.name = nameInput;
-        gameState.petType = selectedSetupType;
-        gameState.playerGender = selectedGender;
-        gameState.playerAge = parseInt(ageInput);
-        gameState.hasPet = true;
-        gameState.lastTime = Date.now();
-        
+        let name = document.getElementById('pet-name-input').value.trim();
+        if (!name) { openPopup("Lỗi", "Vui lòng điền tên cho thú cưng!", "⚠️"); return; }
+        gameState.name = name; gameState.hasPet = true;
         document.getElementById('setup-screen').style.display = 'none';
-        saveGame();
-        showRandomGreeting();
-        updateUI();
+        saveGame(); updateUI();
     }
 
-    // --- HỆ THỐNG CẤP ĐỘ KHÁC ---
     function gainExp(amount) {
         gameState.exp += amount;
-        let nextLevelExp = gameState.level * 100;
-        if (gameState.exp >= nextLevelExp) {
-            gameState.exp -= nextLevelExp;
-            gameState.level++;
-            showPopup('🎉 Lên cấp!', `${gameState.name} đã lên Cấp ${gameState.level}!`);
-            checkQuests('reach_lv2', gameState.level);
+        let cap = gameState.level * 100;
+        if (gameState.exp >= cap) {
+            gameState.exp -= cap; gameState.level++;
+            openPopup("LÊN CẤP! 🎉", `${gameState.name} vừa đạt Cấp ${gameState.level}!`, "🆙");
         }
-        saveGame();
-        updateUI();
+        saveGame(); updateUI();
     }
 
-    // --- HỆ THỐNG ĐỔI TAB ---
-    function switchTab(tabId, btn) {
+    function buildShopUI() {
+        let foodHtml = '', drinkHtml = '';
+        for (let key in itemDetails) {
+            let item = itemDetails[key];
+            let card = `
+                <div class="item-card">
+                    <div style="font-size:24px;">${item.icon}</div>
+                    <div style="font-weight:600; font-size:13px;">${item.name}</div>
+                    <div style="color:#d97706; font-size:12px; margin:4px 0;">💰 ${item.price} xu</div>
+                    <button class="game-btn" style="padding:5px;" onclick="buyItem('${key}')">Mua</button>
+                </div>`;
+            if (item.type === 'food') foodHtml += card; else drinkHtml += card;
+        }
+        document.getElementById('shop-food-list').innerHTML = foodHtml;
+        document.getElementById('shop-drink-list').innerHTML = drinkHtml;
+    }
+
+    function buyItem(id) {
+        let item = itemDetails[id];
+        if (gameState.coins >= item.price) {
+            gameState.coins -= item.price;
+            gameState.inventory[id] = (gameState.inventory[id] || 0) + 1;
+            saveGame(); updateUI();
+        } else { openPopup("Thiếu tiền", "Hãy chơi mini game kiếm thêm nhé!", "🪙"); }
+    }
+
+    document.addEventListener('click', function(e) {
+        if(e.target && e.target.classList.contains('use-item-btn')) {
+            let id = e.target.getAttribute('data-id');
+            if (gameState.inventory[id] > 0) {
+                let item = itemDetails[id];
+                gameState.inventory[id]--;
+                gameState[item.stat] = Math.min(100, gameState[item.stat] + item.value);
+                gainExp(15);
+                if (item.type === 'food') triggerQuestProgress('feed', 1);
+                if (item.type === 'drink') triggerQuestProgress('drink', 1);
+                saveGame(); updateUI();
+            }
+        }
+    });
+
+    function switchTab(id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        if (btn) btn.classList.add('active');
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        backToGameMenu();
     }
 
-    function switchSubTab(subId, btn) {
+    function switchSubTab(id) {
         document.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(subId).classList.add('active');
-        if (btn) btn.classList.add('active');
+        document.getElementById('sb-food').classList.remove('active');
+        document.getElementById('sb-drink').classList.remove('active');
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
     }
 
-    function selectMiniGame(mode, btn) {
-        currentMiniGame = mode;
-        document.querySelectorAll('.mini-mode-btn').forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
-
-        let description = '';
-        if (mode === 'catch') {
-            description = 'Dùng chuột hoặc chạm để di chuyển thú cưng. Hứng nhiều xương càng tốt.';
-        } else if (mode === 'tap') {
-            description = 'Chạm nhanh vào trái tim xuất hiện để tích điểm trong 10 giây.';
-        } else if (mode === 'avoid') {
-            description = 'Điều khiển thú cưng né bom rơi. Sống sót càng lâu, điểm càng cao.';
-        } else if (mode === 'race') {
-            description = 'Nhanh tay di chuyển thú cưng để thu thập những cái sao rơi. Tránh vật cản!';
-        }
-        document.getElementById('game-mode-desc').innerText = description;
-        updatePlaysLeft();
-    }
-
-    function updatePlaysLeft() {
-        let game = gameState.gameStats[currentMiniGame];
-        document.getElementById('plays-left').innerText = `Lượt chơi: ${game.plays}/5`;
-    }
-
-    function decrementPlays() {
-        gameState.gameStats[currentMiniGame].plays--;
-        updatePlaysLeft();
-    }
-
-    // --- MUA SẮM & SỬ DỤNG VẬT PHẨM ---
-    function buyItem(itemId, price) {
-        if (gameState.coins >= price) {
-            gameState.coins -= price;
-            gameState.inventory[itemId] = (gameState.inventory[itemId] || 0) + 1;
-            saveGame();
-            updateUI();
-        } else {
-            showPopup('Thiếu xu', 'Bạn không đủ xu rồi!');
-        }
-    }
-
-    function useItem(itemId) {
-        if (gameState.inventory[itemId] > 0) {
-            let item = itemDetails[itemId];
-            gameState.inventory[itemId]--;
-            
-            // Tăng chỉ số
-            gameState[item.stat] = Math.min(100, gameState[item.stat] + item.value);
-            
-            // Thêm một chút EXP khi chăm sóc thú
-            gainExp(15);
-            
-            if (item.stat === 'hunger') checkQuests('feed', 1);
-
-            saveGame();
-            updateUI();
-        }
-    }
-
-    // --- CẬP NHẬT GIAO DIỆN CHÍNH ---
+    // --- UI RENDER ---
     function updateUI() {
         if (!gameState.hasPet) return;
-
-        // Header thông tin chung
         document.getElementById('display-pet-name').innerText = (gameState.petType === 'dog' ? '🐶 ' : '🐱 ') + gameState.name;
         document.getElementById('display-level').innerText = `Lv ${gameState.level}`;
         document.getElementById('display-coins').innerText = gameState.coins;
-        
-        let nextLevelExp = gameState.level * 100;
-        document.getElementById('text-exp').innerText = `${gameState.exp}/${nextLevelExp}`;
-        document.getElementById('bar-exp').style.width = `${(gameState.exp / nextLevelExp) * 100}%`;
 
-        // Các thanh trạng thái
+        let cap = gameState.level * 100;
+        document.getElementById('text-exp').innerText = `${gameState.exp}/${cap}`;
+        document.getElementById('bar-exp').style.width = `${(gameState.exp / cap) * 100}%`;
+
         document.getElementById('text-hunger').innerText = gameState.hunger;
         document.getElementById('bar-hunger').style.width = `${gameState.hunger}%`;
         document.getElementById('text-thirst').innerText = gameState.thirst;
@@ -968,307 +741,226 @@ const greetingMessages = [
         document.getElementById('text-fun').innerText = gameState.fun;
         document.getElementById('bar-fun').style.width = `${gameState.fun}%`;
 
-        // Cập nhật Avatar tại tab Nhà
         document.getElementById('pet-display').innerText = gameState.petType === 'dog' ? '🐶' : '🐱';
-        
-        // Cập nhật text tâm trạng tùy thuộc vào độ vui vẻ/đói
-        let statusText = "Đang vui vẻ!";
-        if(gameState.hunger < 30) statusText = "Đói bụng quá chủ ơi! 😭";
-        else if(gameState.thirst < 30) statusText = "Khát nước khô cả họng! 🥺";
-        else if(gameState.fun < 30) statusText = "Buồn chán ghê, đi chơi game đi! 🥱";
+
+        let statusText = "Đang rất hạnh phúc và khỏe mạnh! 🥰";
+        if(gameState.hunger < 30) statusText = "Em đói lả người rồi, cho ăn với! 🍗";
+        else if(gameState.thirst < 30) statusText = "Khát nước quá đi chủ ơi! 🥤";
         document.getElementById('pet-status-text').innerText = statusText;
 
-        // Render Túi đồ (Inventory)
         let invHtml = '';
         for (let key in gameState.inventory) {
             let qty = gameState.inventory[key];
-            let item = itemDetails[key];
             if (qty > 0) {
                 invHtml += `
                     <div class="item-card">
-                        <div>${item.icon} ${item.name} (Còn: ${qty})</div>
-                        <button class="game-btn" onclick="useItem('${key}')">Dùng</button>
-                    </div>
-                `;
+                        <div>${itemDetails[key].icon} ${itemDetails[key].name}</div>
+                        <div style="font-size:12px; color:#64748b; margin-bottom:5px;">Số lượng: <b>${qty}</b></div>
+                        <button class="game-btn use-item-btn" data-id="${key}" style="margin-top:0; padding:4px;">Sử dụng</button>
+                    </div>`;
             }
         }
-        document.getElementById('inventory-list').innerHTML = invHtml || '<p style="grid-column: span 2; color:#aaa;">Túi đồ trống rỗng.</p>';
-
-        // Render Nhiệm vụ
-        renderQuests();
+        document.getElementById('inventory-list').innerHTML = invHtml || '<p style="grid-column:span 2; color:#94a3b8; text-align:center; font-size:13px;">Túi đồ của bạn hiện đang trống.</p>';
+        renderQuestsUI();
     }
 
-    // --- HỆ THỐNG NHIỆM VỤ ---
-    function renderQuests() {
-        let questHtml = '';
+    function renderQuestsUI() {
+        let html = '';
         gameState.quests.forEach(q => {
-            let btnStr = q.done ? '✓ Đã xong' : (q.current >= q.target ? `<button class="game-btn" style="width:auto; margin:0;" onclick="claimQuest(${q.id})">Nhận thưởng 💰${q.reward}</button>` : `${q.current}/${q.target}`);
-            questHtml += `
-                <div class="quest-item">
+            let actionBtn = q.done ? `<span style="color:#64748b; font-weight:bold; font-size:13px;">✓ Đã Nhận</span>` : (q.current >= q.target ? `<button class="game-btn" style="width:auto; margin:0; padding:4px 10px; background:#d97706;" onclick="claimQuestReward(${q.id})">Nhận 💰${q.reward}</button>` : `<span style="font-size:12px; color:#475569; font-weight:600;">${q.current}/${q.target}</span>`);
+            html += `
+                <div class="quest-item ${q.done ? 'completed' : ''}">
                     <div>
-                        <div style="font-weight:bold; font-size:14px;">${q.text}</div>
-                        <div class="muted-text" style="font-size:11px;">Thưởng: 💰${q.reward} Xu</div>
+                        <div style="font-size:13px; font-weight:bold;">${q.text}</div>
+                        <div style="font-size:11px; color:#059669; font-weight:600;">Phần thưởng: +💰${q.reward} Xu</div>
                     </div>
-                    <div>${btnStr}</div>
-                </div>
-            `;
+                    <div>${actionBtn}</div>
+                </div>`;
         });
-        document.getElementById('quest-list').innerHTML = questHtml;
+        document.getElementById('quest-list').innerHTML = html;
     }
 
-    function checkQuests(type, amount) {
-        gameState.quests.forEach(q => {
-            if (q.type === type && !q.done) {
-                if(type === 'reach_lv2') q.current = amount; // Với điều kiện cấp độ thì gán bằng cấp độ hiện tại
-                else q.current += amount;
-                
-                if (q.current > q.target) q.current = q.target;
-            }
-        });
+    function triggerQuestProgress(type, amount) {
+        gameState.quests.forEach(q => { if (q.type === type && !q.done) q.current = Math.min(q.target, q.current + amount); });
         saveGame();
-        updateUI();
     }
 
-    function claimQuest(id) {
+    function claimQuestReward(id) {
         let q = gameState.quests.find(x => x.id === id);
         if (q && !q.done && q.current >= q.target) {
-            q.done = true;
-            gameState.coins += q.reward;
-            showPopup('Nhận thưởng', `Nhận thành công 💰${q.reward} Xu từ nhiệm vụ!`);
-            saveGame();
-            updateUI();
+            q.done = true; gameState.coins += q.reward;
+            openPopup("Thành công", `Bạn nhận được 💰${q.reward} Xu!`, "🪙");
+            saveGame(); updateUI();
         }
     }
 
-
-    // --- MINI GAME: HỨNG THỨC ĂN (CANVAS) ---
+    // --- HỆ THỐNG 4 MINI GAME ---
     const canvas = document.getElementById('minigame-canvas');
     const ctx = canvas.getContext('2d');
-    let gameInterval;
-    let gameScore = 0;
-    let petX = 130;
-    let itemX = Math.random() * 280, itemY = 0;
-    let isPlaying = false;
+    const zone = document.getElementById('game-interactive-zone');
 
-    // Di chuyển thanh hứng vật phẩm trên máy tính và điện thoại
-    canvas.addEventListener('mousemove', (e) => {
-        let rect = canvas.getBoundingClientRect();
-        petX = e.clientX - rect.left - 20;
-    });
-    canvas.addEventListener('touchmove', (e) => {
-        let rect = canvas.getBoundingClientRect();
-        petX = e.touches[0].clientX - rect.left - 20;
-    });
-
-    canvas.addEventListener('click', (e) => {
-        if (!isPlaying) return;
-        let rect = canvas.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
-        
-        if (currentMiniGame === 'tap') {
-            let dx = x - miniGameData.targetX;
-            let dy = y - miniGameData.targetY;
-            if (Math.sqrt(dx*dx + dy*dy) < 25) {
-                gameScore++;
-                gameState.coins += 3;
-                miniGameData.targetX = Math.random() * 260 + 10;
-                miniGameData.targetY = Math.random() * 120 + 20;
-                updateMiniGameInfo();
-            }
-        } else if (currentMiniGame === 'race') {
-            let dx = x - miniGameData.targetX;
-            let dy = y - miniGameData.targetY;
-            if (Math.sqrt(dx*dx + dy*dy) < 25) {
-                gameScore++;
-                gameState.coins += 5;
-                miniGameData.targetY = 0;
-                miniGameData.targetX = Math.random() * 260 + 10;
-                miniGameData.speed = Math.min(6, miniGameData.speed + 0.1);
-                updateMiniGameInfo();
-            }
-        }
-    });
-
-    canvas.addEventListener('touchend', (e) => {
-        if (!isPlaying) return;
-        let rect = canvas.getBoundingClientRect();
-        let x = e.changedTouches[0].clientX - rect.left;
-        let y = e.changedTouches[0].clientY - rect.top;
-        
-        if (currentMiniGame === 'tap') {
-            let dx = x - miniGameData.targetX;
-            let dy = y - miniGameData.targetY;
-            if (Math.sqrt(dx*dx + dy*dy) < 25) {
-                gameScore++;
-                gameState.coins += 3;
-                miniGameData.targetX = Math.random() * 260 + 10;
-                miniGameData.targetY = Math.random() * 120 + 20;
-                updateMiniGameInfo();
-            }
-        } else if (currentMiniGame === 'race') {
-            let dx = x - miniGameData.targetX;
-            let dy = y - miniGameData.targetY;
-            if (Math.sqrt(dx*dx + dy*dy) < 25) {
-                gameScore++;
-                gameState.coins += 5;
-                miniGameData.targetY = 0;
-                miniGameData.targetX = Math.random() * 260 + 10;
-                miniGameData.speed = Math.min(6, miniGameData.speed + 0.1);
-                updateMiniGameInfo();
-            }
-        }
-    });
-
-    function startMiniGame() {
-        if (isPlaying) return;
-        let game = gameState.gameStats[currentMiniGame];
-        if (game.plays <= 0) {
-            showPopup('Hết lượt chơi', 'Bạn đã dùng hết 5 lượt chơi hôm nay. Quay lại ngày mai!');
-            return;
-        }
-        isPlaying = true;
-        decrementPlays();
-        gameScore = 0;
-        miniGameData.mode = currentMiniGame;
-        miniGameData.timeLeft = miniGameData.duration;
-        miniGameData.speed = 4;
-        miniGameData.targetX = Math.random() * 260 + 10;
-        miniGameData.targetY = 40;
-        miniGameData.bombX = Math.random() * 260 + 10;
-        miniGameData.bombY = 0;
-        itemY = 0;
-        itemX = Math.random() * 260 + 10;
-        document.getElementById('start-game-btn').disabled = true;
-        updateMiniGameInfo();
-
-        gameInterval = setInterval(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.font = "20px Arial";
-
-            if (currentMiniGame === 'catch') {
-                ctx.fillStyle = '#000';
-                ctx.fillText("🦴", itemX, itemY);
-                ctx.font = "30px Arial";
-                ctx.fillText(gameState.petType === 'dog' ? '🐶' : '🐱', petX, 190);
-                itemY += 4;
-                if (itemY >= 170 && itemY <= 195 && itemX >= petX - 15 && itemX <= petX + 35) {
-                    gameScore++;
-                    gameState.coins += 2;
-                    itemY = 0;
-                    itemX = Math.random() * 260 + 10;
-                }
-                if (itemY > canvas.height) {
-                    endMiniGame(`Bạn hứng được ${gameScore} khúc xương và kiếm được 💰${gameScore * 2} Xu!`);
-                }
-            } else if (currentMiniGame === 'tap') {
-                ctx.fillStyle = '#f59e0b';
-                ctx.font = '28px Arial';
-                ctx.fillText('❤️', miniGameData.targetX, miniGameData.targetY);
-                ctx.font = '14px Arial';
-                ctx.fillStyle = '#000';
-                ctx.fillText('Thời gian: ' + Math.ceil(miniGameData.timeLeft) + 's', 10, 20);
-                miniGameData.timeLeft -= 1 / 60;
-                if (miniGameData.timeLeft <= 0) {
-                    endMiniGame(`Kết thúc Bấm nhanh! Bạn trúng ${gameScore} mục tiêu và kiếm được 💰${gameScore} Xu.`);
-                }
-            } else if (currentMiniGame === 'avoid') {
-                ctx.fillStyle = '#ef4444';
-                ctx.font = '28px Arial';
-                ctx.fillText('💣', miniGameData.bombX, miniGameData.bombY);
-                ctx.font = "30px Arial";
-                ctx.fillStyle = '#000';
-                ctx.fillText(gameState.petType === 'dog' ? '🐶' : '🐱', petX, 190);
-                miniGameData.bombY += miniGameData.speed;
-                if (miniGameData.bombY > canvas.height) {
-                    gameScore++;
-                    gameState.coins += 3;
-                    miniGameData.bombY = 0;
-                    miniGameData.bombX = Math.random() * 260 + 10;
-                    miniGameData.speed = Math.min(8, miniGameData.speed + 0.2);
-                }
-                if (miniGameData.bombY >= 170 && miniGameData.bombY <= 200 && miniGameData.bombX >= petX - 15 && miniGameData.bombX <= petX + 35) {
-                    endMiniGame(`Bạn bị trúng bom! Điểm: ${gameScore}. Thu nhập: 💰${gameScore * 3} Xu.`);
-                }
-                ctx.font = '14px Arial';
-                ctx.fillStyle = '#000';
-                ctx.fillText('Tránh bom: ' + gameScore, 10, 20);
-                ctx.fillText('Điểm: ' + gameScore, 10, 35);
-            } else if (currentMiniGame === 'race') {
-                ctx.font = "30px Arial";
-                ctx.fillText(gameState.petType === 'dog' ? '🐶' : '🐱', petX, 150);
-                ctx.font = "20px Arial";
-                ctx.fillStyle = '#fbbf24';
-                ctx.fillText('⭐', miniGameData.targetX, miniGameData.targetY);
-                ctx.fillStyle = '#ef4444';
-                ctx.fillText('🔧', miniGameData.bombX, miniGameData.bombY);
-                
-                miniGameData.targetY += 3;
-                miniGameData.bombY += miniGameData.speed;
-                if (miniGameData.targetY > canvas.height) {
-                    miniGameData.targetY = 0;
-                    miniGameData.targetX = Math.random() * 260 + 10;
-                }
-                if (miniGameData.bombY > canvas.height) {
-                    miniGameData.bombY = 0;
-                    miniGameData.bombX = Math.random() * 260 + 10;
-                }
-                
-                // Kiểm tra va chạm sao
-                if (miniGameData.targetY >= 140 && miniGameData.targetY <= 160 && miniGameData.targetX >= petX - 20 && miniGameData.targetX <= petX + 40) {
-                    gameScore++;
-                    gameState.coins += 5;
-                    miniGameData.targetY = 0;
-                    miniGameData.targetX = Math.random() * 260 + 10;
-                    miniGameData.speed = Math.min(6, miniGameData.speed + 0.1);
-                }
-                // Kiểm tra va chạm vật cản
-                if (miniGameData.bombY >= 140 && miniGameData.bombY <= 160 && miniGameData.bombX >= petX - 20 && miniGameData.bombX <= petX + 40) {
-                    endMiniGame(`Kết thúc nhanh tay! Bạn tả được ${gameScore} sao và kiếm được 💰${gameScore * 5} Xu.`);
-                }
-                ctx.font = '14px Arial';
-                ctx.fillStyle = '#000';
-                ctx.fillText('Sao: ' + gameScore, 10, 20);
-            }
-
-            if (isPlaying && currentMiniGame !== 'tap' && currentMiniGame !== 'race' && currentMiniGame !== 'avoid') {
-                ctx.fillStyle = '#000';
-                ctx.font = '14px Arial';
-                ctx.fillText('Điểm: ' + gameScore, 10, 20);
-            }
-
-            updateMiniGameInfo();
-        }, 1000 / 60);
-    }
-
-    function updateMiniGameInfo() {
-        if (!isPlaying) {
-            document.getElementById('minigame-info').innerText = 'Nhấn Chơi ngay để bắt đầu.';
-            return;
-        }
-        if (currentMiniGame === 'catch') {
-            document.getElementById('minigame-info').innerText = `Bạn đã hứng: ${gameScore}. Tiếp tục giữ cho xương không rơi.`;
-        } else if (currentMiniGame === 'tap') {
-            document.getElementById('minigame-info').innerText = `Bạn đã chạm: ${gameScore}. Thời gian còn lại ${Math.max(0, Math.ceil(miniGameData.timeLeft))}s.`;
-        } else if (currentMiniGame === 'avoid') {
-            document.getElementById('minigame-info').innerText = `Bạn đã tránh: ${gameScore} quả bom. Tốc độ hiện tại ${miniGameData.speed.toFixed(1)}.`;
-        } else if (currentMiniGame === 'race') {
-            document.getElementById('minigame-info').innerText = `Bạn đã tả: ${gameScore} sao. Tốc độ vật cản: ${miniGameData.speed.toFixed(1)}.`;
-        }
-    }
-
-    function endMiniGame(message) {
-        clearInterval(gameInterval);
-        isPlaying = false;
-        document.getElementById('start-game-btn').disabled = false;
-        gameState.fun = Math.min(100, gameState.fun + 25);
-        gainExp(20);
-        checkQuests('game_score', gameScore);
-        showPopup('Trò chơi kết thúc', message);
+    function backToGameMenu() {
+        clearInterval(gameLoopInterval);
+        canvas.style.display = 'none'; zone.innerHTML = '';
+        document.getElementById('minigame-area').style.display = 'none';
+        document.getElementById('game-menu').style.display = 'block';
         updateUI();
     }
 
-    // Chạy game khi mở trang
+    function initMiniGame(gameId) {
+        document.getElementById('game-menu').style.display = 'none';
+        document.getElementById('minigame-area').style.display = 'block';
+        canvas.style.display = 'none'; zone.innerHTML = '';
+        gameState.fun = Math.min(100, gameState.fun + 15); gainExp(10);
+
+        if (gameId === 1) {
+            document.getElementById('game-title').innerText = "Game 1: Hứng Thức Ăn (Vuốt)";
+            canvas.style.display = 'block'; runGameHungXuong();
+        } else if (gameId === 2) {
+            document.getElementById('game-title').innerText = "Game 2: Siêu Phản Xạ (Chế Độ Khó)";
+            runGamePhanXaPro();
+        } else if (gameId === 3) {
+            document.getElementById('game-title').innerText = "Game 3: Tung Đồng Xu";
+            runGameTungXu();
+        } else if (gameId === 4) {
+            document.getElementById('game-title').innerText = "Game 4: Đoán Số Thần Kì";
+            runGameDoanSo();
+        }
+    }
+
+    // GAME 1: HỨNG XƯƠNG
+    function runGameHungXuong() {
+        let score = 0, pX = 140, bX = Math.random()*280, bY = 0;
+        const moveHandler = (e) => {
+            let rect = canvas.getBoundingClientRect();
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            pX = clientX - rect.left - 20;
+            if (pX < 0) pX = 0; if (pX > 280) pX = 280;
+        };
+        canvas.onmousemove = moveHandler; canvas.ontouchmove = moveHandler;
+
+        gameLoopInterval = setInterval(() => {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.font = "20px Arial"; ctx.fillText("🦴", bX, bY);
+            ctx.font = "28px Arial"; ctx.fillText(gameState.petType === 'dog'?'🐶':'🐱', pX, 205);
+            bY += 4.5;
+            if (bY >= 185 && bY <= 210 && bX >= pX - 15 && bX <= pX + 30) {
+                score++; gameState.coins += 3; triggerQuestProgress('game_bone', 1);
+                bY = 0; bX = Math.random()*280;
+            }
+            if (bY > canvas.height) {
+                clearInterval(gameLoopInterval);
+                openPopup("Kết thúc", `Bạn hứng được ${score} khúc xương và nhận 💰${score * 3} xu!`, "🦴");
+                backToGameMenu();
+            }
+            ctx.fillStyle = "#1e293b"; ctx.font = "bold 13px Arial"; ctx.fillText("Điểm: " + score, 10, 20);
+        }, 1000/60);
+    }
+
+    // GAME 2: SIÊU PHẢN XẠ NÂNG CAO
+    function runGamePhanXaPro() {
+        zone.innerHTML = `
+            <p style="font-size:13px; color:#64748b; padding:0 10px;">Luật: Chỉ chạm khi bia chuyển sang màu <b style="color:#22c55e;">XANH LÁ</b>. Nếu bia màu <b style="color:#eab308;">VÀNG</b> hoặc bấm quá sớm thì <b style="color:#ef4444;">THUA</b>!</p>
+            <div id="click-target">ĐỢI...</div>
+            <div id="px-score" style="font-weight:bold; margin-top:10px;">Điểm phản xạ: 0</div>`;
+        
+        let score = 0, state = "red", timeoutNode = null;
+        let targetBtn = document.getElementById('click-target');
+
+        function startRound() {
+            state = "red";
+            targetBtn.style.background = "#ef4444";
+            targetBtn.innerHTML = "ĐỢI...";
+            let delay = Math.random() * 1500 + 1000;
+            
+            timeoutNode = setTimeout(() => {
+                if(Math.random() < 0.35) {
+                    state = "fake";
+                    targetBtn.style.background = "#eab308";
+                    targetBtn.innerHTML = "ĐỪNG BẤM!<br><span style='font-size:10px;'>BẪY ĐẤY</span>";
+                    timeoutNode = setTimeout(() => { startRound(); }, 750);
+                } else {
+                    state = "green";
+                    targetBtn.style.background = "#22c55e";
+                    targetBtn.innerHTML = "BẤM NGAY!";
+                }
+            }, delay);
+        }
+
+        targetBtn.onpointerdown = (e) => {
+            e.preventDefault();
+            if (state === "green") {
+                score++;
+                document.getElementById('px-score').innerText = "Điểm phản xạ: " + score;
+                gameState.coins += 8;
+                triggerQuestProgress('game_click', 1);
+                clearTimeout(timeoutNode);
+                startRound();
+            } else {
+                clearTimeout(timeoutNode);
+                let textFail = (state === "fake") ? "Bạn bị dính bẫy nút màu VÀNG!" : "Bạn nhấn quá sớm khi nút còn màu ĐỎ!";
+                openPopup("Thất bại ⚡", `${textFail} Điểm đạt được: ${score}. Thưởng: 💰${score * 8} xu.`, "💥");
+                backToGameMenu();
+            }
+        };
+        startRound();
+    }
+
+    // GAME 3: TUNG ĐỒNG XU
+    function runGameTungXu() {
+        zone.innerHTML = `
+            <p style="font-size:13px; color:#64748b;">Cược 10 xu đoán mặt đồng xu:</p>
+            <div style="font-size:60px; margin:15px 0;">🪙</div>
+            <button class="game-btn" style="width:45%; margin-right:5px; background:#3b82f6;" onclick="playTungXu('Sấp')">Chọn SẤP</button>
+            <button class="game-btn" style="width:45%; background:#ec4899;" onclick="playTungXu('Ngửa')">Chọn NGỬA</button>`;
+    }
+window.playTungXu = function(userChoice) {
+        if (gameState.coins < 10) { 
+            openPopup("Lỗi", "Bạn cần ít nhất 10 xu để đặt cược!", "⚠️"); 
+            return; 
+        }
+        
+        // Trừ 10 xu tiền cược ban đầu
+        gameState.coins -= 10;
+        
+        let result = Math.random() < 0.5 ? "Sấp" : "Ngửa";
+        
+        if (userChoice === result) {
+            // Nếu thắng: Trả lại 10 xu gốc + thưởng 10 xu (Tổng cộng cộng 20 xu)
+            gameState.coins += 20; 
+            openPopup("Thắng rồi! 🎉", `Kết quả là [${result}]. Bạn đoán chính xác và nhận được 💰20 xu!`, "🪙");
+        } else {
+            // Nếu thua: Không cộng lại xu (Mất 10 xu cược)
+            openPopup("Tiếc quá... 😢", `Kết quả là [${result}]. Bạn chọn [${userChoice}] chưa chính xác rồi!`, "❌");
+        }
+        
+        // QUAN TRỌNG: Lưu và cập nhật lại giao diện tiền xu ngay lập tức
+        saveGame(); 
+        updateUI();
+        
+        // Vẽ lại giao diện trò chơi đặt cược
+        runGameTungXu();
+    };
+
+    // GAME 4: ĐOÁN SỐ
+    function runGameDoanSo() {
+        let secretNum = Math.floor(Math.random() * 10) + 1;
+        zone.innerHTML = `
+            <p style="font-size:13px; color:#64748b;">Đoán số bí ẩn trong khoảng từ 1 đến 10:</p>
+            <input type="number" id="guess-input" min="1" max="10" pattern="[0-9]*" inputmode="numeric" style="width:65px; padding:8px; text-align:center; font-size:18px; border-radius:8px; border:2px solid #cbd5e1; background:var(--sub-panel); color:var(--text-color); margin-bottom:10px;"><br>
+            <button class="game-btn" style="width:60%;" id="btn-guess">Đoán số</button>`;
+        
+        document.getElementById('btn-guess').onclick = () => {
+            let userVal = parseInt(document.getElementById('guess-input').value);
+            if(isNaN(userVal) || userVal < 1 || userVal > 10) { return; }
+            triggerQuestProgress('game_guess', 1);
+            if(userVal === secretNum) {
+                gameState.coins += 35; openPopup("Chính xác!", `Số bí mật là [${secretNum}]. Thưởng lớn: 💰35 xu!`, "👑");
+            } else { openPopup("Sai rồi", `Số đúng là [${secretNum}]. Chúc bạn may mắn lần sau!`, "🔮"); }
+            runGameDoanSo();
+        };
+    }
+
     window.onload = initGame;
 </script>
 
