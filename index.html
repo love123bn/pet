@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Trang 1: Splash Screen -->
+    <div id="page1" class="page active">
+        <div class="splash-content">
+            <div class="floating-hearts" id="floatingHearts"></div>
+            <h1 class="splash-title">Love</h1>
+            <p class="splash-subtitle">Nhấn vào để mở ra điều tuyệt vời</p>
+            <button id="enterBtn" class="enter-btn">
+                <span>Mở trái tim</span>
+                <div class="btn-heart">❤</div>
+            </button>
+        </div>
+        <div class="sparkles" id="sparkles"></div>
+    </div>
+
+    <!-- Trang 2: Heart Page -->
+    <div id="page2" class="page">
+        <canvas id="heartCanvas"></canvas>
+        <div class="drag-hint" id="dragHint">vuốt để xoay trái tim</div>
+        <h2 class="love-text" id="loveText"></h2>
+        <div class="mini-hearts" id="miniHearts"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
